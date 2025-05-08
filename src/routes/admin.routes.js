@@ -1,6 +1,6 @@
-import express from 'express';
-import { body } from 'express-validator';
-import AdminController from '../controllers/admin.controller.js';
+const express = require('express');
+const { body } = require('express-validator');
+const AdminController = require('../controllers/admin.controller');
 
 const router = express.Router();
 
@@ -29,4 +29,4 @@ router.delete('/:id', AdminController.delete);
 router.get('/', AdminController.getAll);
 router.get('/:id', AdminController.getById);
 
-export default router; 
+module.exports = router; 
