@@ -1,5 +1,5 @@
-const Admin = require('../models/admin.model');
-const { validationResult } = require('express-validator');
+import Admin from '../models/admin.model.js';
+import { validationResult } from 'express-validator';
 
 class AdminController {
     static async create(req, res) {
@@ -87,4 +87,4 @@ class AdminController {
     }
 }
 
-module.exports = AdminController; 
+export default AdminController; 
