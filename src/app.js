@@ -1,10 +1,11 @@
 // Importación de dependencias necesarias
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import adminRoutes from './routes/admin.routes.js';
 
-// Importación de rutas
-const adminRoutes = require('./routes/admin.routes');
+// Configuración de variables de entorno
+dotenv.config();
 
 // Inicialización de la aplicación Express
 const app = express();

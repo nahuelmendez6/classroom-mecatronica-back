@@ -1,7 +1,7 @@
 // Importación de dependencias
-const express = require('express');
-const { body } = require('express-validator');
-const AdminController = require('../controllers/admin.controller');
+import express from 'express';
+import { body } from 'express-validator';
+import AdminController from '../controllers/admin.controller.js';
 
 // Creación del router de Express
 const router = express.Router();
@@ -45,4 +45,4 @@ router.get('/', AdminController.getAll);
 // GET /api/admins/:id - Obtener un administrador específico
 router.get('/:id', AdminController.getById);
 
-module.exports = router; 
+export default router; 
