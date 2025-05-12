@@ -7,28 +7,28 @@ import { validationResult } from 'express-validator';
 class AdminController {
     /**
      * Crea un nuevo administrador
-     * @param {Object} req - Objeto de solicitud Express
-     * @param {Object} res - Objeto de respuesta Express
+     * @param {Object} req - Request object
+     * @param {Object} res - Response object
      */
     static async create(req, res) {
         try {
-            // Validamos los datos de entrada
+            // Validar los datos de entrada
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
-                return res.status(400).json({ errors: errors.array() });
+                return res.status(400).json({
+                    success: false,
+                    message: 'Validation error',
+                    errors: errors.array()
+                });
             }
 
-            // Creamos el administrador
             const admin = await Admin.create(req.body);
-            
-            // Respondemos con éxito
             res.status(201).json({
                 success: true,
                 message: 'Admin created successfully',
                 data: admin
             });
         } catch (error) {
-            console.error('Error creating admin:', error);
             res.status(500).json({
                 success: false,
                 message: 'Error creating admin',
@@ -38,9 +38,9 @@ class AdminController {
     }
 
     /**
-     * Elimina un administrador existente
-     * @param {Object} req - Objeto de solicitud Express
-     * @param {Object} res - Objeto de respuesta Express
+     * Realiza un soft-delete de un administrador
+     * @param {Object} req - Request object
+     * @param {Object} res - Response object
      */
     static async delete(req, res) {
         try {
@@ -51,7 +51,6 @@ class AdminController {
                 message: 'Admin deleted successfully'
             });
         } catch (error) {
-            console.error('Error deleting admin:', error);
             res.status(500).json({
                 success: false,
                 message: 'Error deleting admin',
@@ -61,9 +60,9 @@ class AdminController {
     }
 
     /**
-     * Obtiene todos los administradores
-     * @param {Object} req - Objeto de solicitud Express
-     * @param {Object} res - Objeto de respuesta Express
+     * Obtiene todos los administradores activos
+     * @param {Object} req - Request object
+     * @param {Object} res - Response object
      */
     static async getAll(req, res) {
         try {
@@ -73,7 +72,6 @@ class AdminController {
                 data: admins
             });
         } catch (error) {
-            console.error('Error getting admins:', error);
             res.status(500).json({
                 success: false,
                 message: 'Error getting admins',
@@ -83,16 +81,15 @@ class AdminController {
     }
 
     /**
-     * Obtiene un administrador específico por su ID
-     * @param {Object} req - Objeto de solicitud Express
-     * @param {Object} res - Objeto de respuesta Express
+     * Obtiene un administrador por su ID
+     * @param {Object} req - Request object
+     * @param {Object} res - Response object
      */
     static async getById(req, res) {
         try {
             const { id } = req.params;
             const admin = await Admin.getById(id);
             
-            // Si no se encuentra el administrador, devolvemos 404
             if (!admin) {
                 return res.status(404).json({
                     success: false,
@@ -105,10 +102,31 @@ class AdminController {
                 data: admin
             });
         } catch (error) {
-            console.error('Error getting admin:', error);
             res.status(500).json({
                 success: false,
                 message: 'Error getting admin',
+                error: error.message
+            });
+        }
+    }
+
+    /**
+     * Restaura un administrador eliminado
+     * @param {Object} req - Request object
+     * @param {Object} res - Response object
+     */
+    static async restore(req, res) {
+        try {
+            const { id } = req.params;
+            await Admin.restore(id);
+            res.json({
+                success: true,
+                message: 'Admin restored successfully'
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'Error restoring admin',
                 error: error.message
             });
         }

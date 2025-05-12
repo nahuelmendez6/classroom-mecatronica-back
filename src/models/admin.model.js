@@ -1,145 +1,169 @@
-import db from '../../config/database.js';
+import { pool } from '../../config/database.js';
 import bcrypt from 'bcryptjs';
 
 /**
- * Clase que maneja todas las operaciones relacionadas con administradores en la base de datos
+ * Clase que maneja las operaciones de base de datos relacionadas con los administradores
  */
 class Admin {
     /**
-     * Crea un nuevo administrador en el sistema
+     * Crea un nuevo administrador
      * @param {Object} adminData - Datos del administrador
      * @param {string} adminData.email - Email del administrador
      * @param {string} adminData.password - Contraseña del administrador
      * @param {string} adminData.name - Nombre del administrador
      * @param {string} adminData.lastname - Apellido del administrador
-     * @returns {Object} Datos del administrador creado
+     * @returns {Promise<Object>} Datos del administrador creado
      */
     static async create(adminData) {
+        const connection = await pool.getConnection();
         try {
-            const { email, password, name, lastname } = adminData;
-            
-            // Iniciamos una transacción para asegurar la integridad de los datos
-            const connection = await db.getConnection();
             await connection.beginTransaction();
 
-            try {
-                // Encriptamos la contraseña antes de guardarla
-                const salt = await bcrypt.genSalt(10);
-                const hashedPassword = await bcrypt.hash(password, salt);
+            // Hashear la contraseña
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(adminData.password, salt);
 
-                // Primero creamos el usuario en la tabla user
-                const [userResult] = await connection.execute(
-                    'INSERT INTO user (email, password, id_role) VALUES (?, ?, 1)',
-                    [email, hashedPassword]
-                );
+            // Insertar en la tabla user
+            const [userResult] = await connection.query(
+                'INSERT INTO user (email, password, name, lastname, id_role) VALUES (?, ?, ?, ?, 1)',
+                [adminData.email, hashedPassword, adminData.name, adminData.lastname]
+            );
 
-                const userId = userResult.insertId;
+            // Insertar en la tabla admin
+            const [adminResult] = await connection.query(
+                'INSERT INTO admin (id_user) VALUES (?)',
+                [userResult.insertId]
+            );
 
-                // Luego creamos el registro en la tabla admin
-                const [adminResult] = await connection.execute(
-                    'INSERT INTO admin (id_user, name, lastname) VALUES (?, ?, ?)',
-                    [userId, name, lastname]
-                );
+            await connection.commit();
 
-                // Si todo sale bien, confirmamos la transacción
-                await connection.commit();
-                return { id: adminResult.insertId, userId, name, lastname, email };
-            } catch (error) {
-                // Si algo sale mal, revertimos la transacción
-                await connection.rollback();
-                throw error;
-            } finally {
-                // Liberamos la conexión
-                connection.release();
-            }
+            return {
+                id: adminResult.insertId,
+                ...adminData,
+                password: undefined // No devolver la contraseña
+            };
         } catch (error) {
+            await connection.rollback();
             throw error;
+        } finally {
+            connection.release();
         }
     }
 
     /**
-     * Elimina un administrador del sistema
-     * @param {number} adminId - ID del administrador a eliminar
-     * @returns {boolean} true si se eliminó correctamente
+     * Realiza un soft-delete de un administrador
+     * @param {number} id - ID del administrador a eliminar
+     * @returns {Promise<boolean>} true si se eliminó correctamente
      */
-    static async delete(adminId) {
+    static async delete(id) {
+        const connection = await pool.getConnection();
         try {
-            const connection = await db.getConnection();
             await connection.beginTransaction();
 
-            try {
-                // Obtenemos el ID del usuario asociado al administrador
-                const [admin] = await connection.execute(
-                    'SELECT id_user FROM admin WHERE id_admin = ?',
-                    [adminId]
-                );
+            // Obtener el id_user asociado al admin
+            const [adminResult] = await connection.query(
+                'SELECT id_user FROM admin WHERE id_admin = ? AND is_deleted = FALSE',
+                [id]
+            );
 
-                if (admin.length === 0) {
-                    throw new Error('Admin not found');
-                }
-
-                const userId = admin[0].id_user;
-
-                // Eliminamos el registro de la tabla admin
-                await connection.execute(
-                    'DELETE FROM admin WHERE id_admin = ?',
-                    [adminId]
-                );
-
-                // Eliminamos el registro de la tabla user
-                await connection.execute(
-                    'DELETE FROM user WHERE id_user = ?',
-                    [userId]
-                );
-
-                await connection.commit();
-                return true;
-            } catch (error) {
-                await connection.rollback();
-                throw error;
-            } finally {
-                connection.release();
+            if (adminResult.length === 0) {
+                throw new Error('Admin not found');
             }
+
+            const userId = adminResult[0].id_user;
+
+            // Realizar soft-delete en la tabla admin
+            await connection.query(
+                'UPDATE admin SET is_deleted = TRUE, deleted_at = NOW() WHERE id_admin = ?',
+                [id]
+            );
+
+            // Realizar soft-delete en la tabla user
+            await connection.query(
+                'UPDATE user SET is_deleted = TRUE, deleted_at = NOW() WHERE id_user = ?',
+                [userId]
+            );
+
+            await connection.commit();
+            return true;
         } catch (error) {
+            await connection.rollback();
             throw error;
+        } finally {
+            connection.release();
         }
     }
 
     /**
-     * Obtiene todos los administradores del sistema
-     * @returns {Array} Lista de administradores
+     * Obtiene todos los administradores activos
+     * @returns {Promise<Array>} Lista de administradores
      */
     static async getAll() {
-        try {
-            const [admins] = await db.execute(`
-                SELECT a.id_admin, a.name, a.lastname, u.email, u.is_active, u.created_at
-                FROM admin a
-                JOIN user u ON a.id_user = u.id_user
-                ORDER BY a.id_admin DESC
-            `);
-            return admins;
-        } catch (error) {
-            throw error;
-        }
+        const [rows] = await pool.query(`
+            SELECT a.id_admin, u.email, u.name, u.lastname, u.created_at
+            FROM admin a
+            JOIN user u ON a.id_user = u.id_user
+            WHERE a.is_deleted = FALSE AND u.is_deleted = FALSE
+        `);
+        return rows;
     }
 
     /**
-     * Obtiene un administrador específico por su ID
-     * @param {number} adminId - ID del administrador a buscar
-     * @returns {Object|null} Datos del administrador o null si no existe
+     * Obtiene un administrador por su ID
+     * @param {number} id - ID del administrador
+     * @returns {Promise<Object>} Datos del administrador
      */
-    static async getById(adminId) {
+    static async getById(id) {
+        const [rows] = await pool.query(`
+            SELECT a.id_admin, u.email, u.name, u.lastname, u.created_at
+            FROM admin a
+            JOIN user u ON a.id_user = u.id_user
+            WHERE a.id_admin = ? AND a.is_deleted = FALSE AND u.is_deleted = FALSE
+        `, [id]);
+        return rows[0];
+    }
+
+    /**
+     * Restaura un administrador eliminado
+     * @param {number} id - ID del administrador a restaurar
+     * @returns {Promise<boolean>} true si se restauró correctamente
+     */
+    static async restore(id) {
+        const connection = await pool.getConnection();
         try {
-            const [admins] = await db.execute(`
-                SELECT a.id_admin, a.name, a.lastname, u.email, u.is_active, u.created_at
-                FROM admin a
-                JOIN user u ON a.id_user = u.id_user
-                WHERE a.id_admin = ?
-            `, [adminId]);
-            
-            return admins[0] || null;
+            await connection.beginTransaction();
+
+            // Obtener el id_user asociado al admin
+            const [adminResult] = await connection.query(
+                'SELECT id_user FROM admin WHERE id_admin = ? AND is_deleted = TRUE',
+                [id]
+            );
+
+            if (adminResult.length === 0) {
+                throw new Error('Admin not found or not deleted');
+            }
+
+            const userId = adminResult[0].id_user;
+
+            // Restaurar en la tabla admin
+            await connection.query(
+                'UPDATE admin SET is_deleted = FALSE, deleted_at = NULL WHERE id_admin = ?',
+                [id]
+            );
+
+            // Restaurar en la tabla user
+            await connection.query(
+                'UPDATE user SET is_deleted = FALSE, deleted_at = NULL WHERE id_user = ?',
+                [userId]
+            );
+
+            await connection.commit();
+            return true;
         } catch (error) {
+            await connection.rollback();
             throw error;
+        } finally {
+            connection.release();
         }
     }
 }

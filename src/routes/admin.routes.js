@@ -45,4 +45,7 @@ router.get('/', AdminController.getAll);
 // GET /api/admins/:id - Obtener un administrador específico
 router.get('/:id', AdminController.getById);
 
+// POST /api/admins/:id/restore - Restaurar un administrador eliminado
+router.post('/:id/restore', AdminController.restore);
+
 export default router; 
