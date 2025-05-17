@@ -10,7 +10,7 @@ const router = express.Router();
  * Middleware de validación para los datos del administrador
  * Valida:
  * - Email: debe ser un email válido
- * - Password: mínimo 6 caracteres
+ * - Password: no puede estar vacío
  * - Name: no puede estar vacío
  * - Lastname: no puede estar vacío
  */
@@ -20,8 +20,8 @@ const validateAdmin = [
         .withMessage('Please enter a valid email')
         .normalizeEmail(),
     body('password')
-        .isLength({ min: 6 })
-        .withMessage('Password must be at least 6 characters long'),
+        .notEmpty()
+        .withMessage('Password is required'),
     body('name')
         .notEmpty()
         .withMessage('Name is required')

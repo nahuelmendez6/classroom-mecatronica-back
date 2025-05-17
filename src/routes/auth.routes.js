@@ -12,8 +12,8 @@ const loginValidation = [
         .withMessage('El email debe ser válido')
         .normalizeEmail(),
     body('password')
-        .isLength({ min: 6 })
-        .withMessage('La contraseña debe tener al menos 6 caracteres')
+        .notEmpty()
+        .withMessage('La contraseña es requerida')
 ];
 
 // Rutas públicas

@@ -3,6 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import adminRoutes from './routes/admin.routes.js';
+import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
 
 // Configuración de variables de entorno
 dotenv.config();
@@ -21,6 +23,10 @@ app.use(express.urlencoded({ extended: true }));
 // Configuración de rutas
 // Todas las rutas de administradores comenzarán con /api/admins
 app.use('/api/admins', adminRoutes);
+// Todas las rutas de autenticacion comenzarán con /api/auth'
+app.use('/api/auth', authRoutes);
+// Todas las rutas de usuarios comenzarán con /api/users
+app.use('/api/users', userRoutes);
 
 // Middleware de manejo de errores global
 // Se ejecuta cuando ocurre un error en cualquier parte de la aplicación
@@ -33,6 +39,8 @@ app.use((err, req, res, next) => {
         error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
 });
+
+
 
 // Inicio del servidor
 const PORT = process.env.PORT || 3000;

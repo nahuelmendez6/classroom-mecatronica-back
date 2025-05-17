@@ -38,7 +38,10 @@ class AuthController {
                 { 
                     id_user: user.id_user,
                     email: user.email,
-                    role: user.role,
+                    role: {
+                        id_role: user.role.id_role,
+                        name: user.role.name
+                    },
                     sessionId 
                 },
                 process.env.JWT_SECRET,
