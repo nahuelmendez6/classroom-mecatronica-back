@@ -1,0 +1,964 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+-- Schema ies9021_PPII-SEGUIMIENTO-MECATRONICA
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema ies9021_PPII-SEGUIMIENTO-MECATRONICA
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`role`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`role` (
+  `id_role` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL,
+  `description` TEXT NULL DEFAULT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_role`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user` (
+  `id_user` INT NOT NULL AUTO_INCREMENT,
+  `email` VARCHAR(255) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `is_active` TINYINT(1) NULL DEFAULT '1',
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `id_role` INT NOT NULL,
+  PRIMARY KEY (`id_user`),
+  UNIQUE INDEX `email` (`email` ASC) VISIBLE,
+  INDEX `id_role` (`id_role` ASC) VISIBLE,
+  CONSTRAINT `user_ibfk_1`
+    FOREIGN KEY (`id_role`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`role` (`id_role`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`admin`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`admin` (
+  `id_admin` INT NOT NULL AUTO_INCREMENT,
+  `id_user` INT NOT NULL,
+  `name` VARCHAR(100) NULL DEFAULT NULL,
+  `lastname` VARCHAR(100) NULL DEFAULT NULL,
+  PRIMARY KEY (`id_admin`),
+  INDEX `id_user` (`id_user` ASC) VISIBLE,
+  CONSTRAINT `admin_ibfk_1`
+    FOREIGN KEY (`id_user`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user` (`id_user`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`company`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`company` (
+  `id_company` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `cuit` VARCHAR(20) NOT NULL,
+  `sector` VARCHAR(100) NULL DEFAULT NULL,
+  `description` TEXT NULL DEFAULT NULL,
+  `size` VARCHAR(50) NULL DEFAULT NULL,
+  PRIMARY KEY (`id_company`),
+  UNIQUE INDEX `cuit` (`cuit` ASC) VISIBLE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`agreement`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`agreement` (
+  `id_agreement` INT NOT NULL AUTO_INCREMENT,
+  `start_date` DATE NOT NULL,
+  `end_date` DATE NOT NULL,
+  `document_url` TEXT NULL DEFAULT NULL,
+  `id_company` INT NOT NULL,
+  PRIMARY KEY (`id_agreement`),
+  INDEX `id_company` (`id_company` ASC) VISIBLE,
+  CONSTRAINT `agreement_ibfk_1`
+    FOREIGN KEY (`id_company`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`company` (`id_company`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`course`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`course` (
+  `id_course` INT NOT NULL AUTO_INCREMENT,
+  `course` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id_course`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`student`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`student` (
+  `id_student` INT NOT NULL AUTO_INCREMENT,
+  `id_user` INT NOT NULL,
+  `name` VARCHAR(100) NULL DEFAULT NULL,
+  `lastname` VARCHAR(100) NULL DEFAULT NULL,
+  `dni` VARCHAR(20) NULL DEFAULT NULL,
+  `phone_number` VARCHAR(30) NULL DEFAULT NULL,
+  `id_course` INT NULL DEFAULT NULL,
+  `observations` TEXT NULL DEFAULT NULL,
+  PRIMARY KEY (`id_student`),
+  INDEX `id_user` (`id_user` ASC) VISIBLE,
+  INDEX `id_course` (`id_course` ASC) VISIBLE,
+  CONSTRAINT `student_ibfk_1`
+    FOREIGN KEY (`id_user`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user` (`id_user`)
+    ON DELETE CASCADE,
+  CONSTRAINT `student_ibfk_2`
+    FOREIGN KEY (`id_course`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`course` (`id_course`)
+    ON DELETE SET NULL)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`attendance`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`attendance` (
+  `id_attendance` INT NOT NULL AUTO_INCREMENT,
+  `id_student` INT NOT NULL,
+  `id_company` INT NOT NULL,
+  `attendance_date` DATE NOT NULL,
+  `entry_time` TIME NOT NULL,
+  `exit_time` TIME NOT NULL,
+  `observations` TEXT NULL DEFAULT NULL,
+  `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_attendance`),
+  INDEX `id_student` (`id_student` ASC) VISIBLE,
+  INDEX `id_company` (`id_company` ASC) VISIBLE,
+  CONSTRAINT `attendance_ibfk_1`
+    FOREIGN KEY (`id_student`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`student` (`id_student`)
+    ON DELETE CASCADE,
+  CONSTRAINT `attendance_ibfk_2`
+    FOREIGN KEY (`id_company`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`company` (`id_company`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`auditory_logs`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`auditory_logs` (
+  `id_auditory` INT NOT NULL AUTO_INCREMENT,
+  `action` VARCHAR(100) NULL DEFAULT NULL,
+  `affected_table` VARCHAR(100) NULL DEFAULT NULL,
+  `previous_data` TEXT NULL DEFAULT NULL,
+  `new_data` TEXT NULL DEFAULT NULL,
+  `date_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_agent` TEXT NULL DEFAULT NULL,
+  `ip_address` VARCHAR(45) NULL DEFAULT NULL,
+  `id_user` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`id_auditory`),
+  INDEX `id_user` (`id_user` ASC) VISIBLE,
+  CONSTRAINT `auditory_logs_ibfk_1`
+    FOREIGN KEY (`id_user`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user` (`id_user`)
+    ON DELETE SET NULL)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`backup_settings`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`backup_settings` (
+  `id_backup_settings` INT NOT NULL AUTO_INCREMENT,
+  `automatic_backup` TINYINT(1) NULL DEFAULT '1',
+  `backup_frequency` VARCHAR(50) NULL DEFAULT NULL,
+  `backup_path` TEXT NULL DEFAULT NULL,
+  `backup_retention_days` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`id_backup_settings`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`company_address`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`company_address` (
+  `id_company_address` INT NOT NULL AUTO_INCREMENT,
+  `street` VARCHAR(255) NULL DEFAULT NULL,
+  `number` VARCHAR(10) NULL DEFAULT NULL,
+  `city` VARCHAR(100) NULL DEFAULT NULL,
+  `department` VARCHAR(100) NULL DEFAULT NULL,
+  `id_company` INT NOT NULL,
+  PRIMARY KEY (`id_company_address`),
+  INDEX `id_company` (`id_company` ASC) VISIBLE,
+  CONSTRAINT `company_address_ibfk_1`
+    FOREIGN KEY (`id_company`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`company` (`id_company`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`company_contact`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`company_contact` (
+  `id_contact` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NULL DEFAULT NULL,
+  `last_name` VARCHAR(100) NULL DEFAULT NULL,
+  `email` VARCHAR(255) NULL DEFAULT NULL,
+  `position` VARCHAR(100) NULL DEFAULT NULL,
+  `phone` VARCHAR(30) NULL DEFAULT NULL,
+  `id_user` INT NOT NULL,
+  `id_company` INT NOT NULL,
+  PRIMARY KEY (`id_contact`),
+  INDEX `id_user` (`id_user` ASC) VISIBLE,
+  INDEX `id_company` (`id_company` ASC) VISIBLE,
+  CONSTRAINT `company_contact_ibfk_1`
+    FOREIGN KEY (`id_user`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user` (`id_user`)
+    ON DELETE CASCADE,
+  CONSTRAINT `company_contact_ibfk_2`
+    FOREIGN KEY (`id_company`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`company` (`id_company`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`report`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`report` (
+  `id_report` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `type` ENUM('Asistencia', 'Evaluación', 'Prácticas', 'Personalizado') NOT NULL,
+  `generated_at` DATETIME NOT NULL,
+  `status` ENUM('Completado', 'En Proceso', 'Fallido') NULL DEFAULT 'Completado',
+  `file_path` TEXT NULL DEFAULT NULL,
+  `is_scheduled` TINYINT(1) NULL DEFAULT '0',
+  `is_active` TINYINT(1) NULL DEFAULT '1',
+  PRIMARY KEY (`id_report`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`custom_report`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`custom_report` (
+  `id_custom_report` INT NOT NULL AUTO_INCREMENT,
+  `id_report` INT NOT NULL,
+  `filters` JSON NULL DEFAULT NULL,
+  `created_by` INT NULL DEFAULT NULL,
+  `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_custom_report`),
+  INDEX `id_report` (`id_report` ASC) VISIBLE,
+  INDEX `created_by` (`created_by` ASC) VISIBLE,
+  CONSTRAINT `custom_report_ibfk_1`
+    FOREIGN KEY (`id_report`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`report` (`id_report`)
+    ON DELETE CASCADE,
+  CONSTRAINT `custom_report_ibfk_2`
+    FOREIGN KEY (`created_by`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user` (`id_user`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`permission`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`permission` (
+  `id_permission` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_by` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`id_permission`),
+  INDEX `created_by` (`created_by` ASC) VISIBLE,
+  CONSTRAINT `permission_ibfk_1`
+    FOREIGN KEY (`created_by`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user` (`id_user`)
+    ON DELETE SET NULL)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`has_permission`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`has_permission` (
+  `id_role` INT NOT NULL,
+  `id_permission` INT NOT NULL,
+  PRIMARY KEY (`id_role`, `id_permission`),
+  INDEX `id_permission` (`id_permission` ASC) VISIBLE,
+  CONSTRAINT `has_permission_ibfk_1`
+    FOREIGN KEY (`id_role`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`role` (`id_role`)
+    ON DELETE CASCADE,
+  CONSTRAINT `has_permission_ibfk_2`
+    FOREIGN KEY (`id_permission`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`permission` (`id_permission`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`module`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`module` (
+  `id_module` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `description` TEXT NULL DEFAULT NULL,
+  `duration` INT NULL DEFAULT NULL,
+  `icon_url` TEXT NULL DEFAULT NULL,
+  `id_course` INT NOT NULL,
+  PRIMARY KEY (`id_module`),
+  INDEX `id_course` (`id_course` ASC) VISIBLE,
+  CONSTRAINT `module_ibfk_1`
+    FOREIGN KEY (`id_course`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`course` (`id_course`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`learning_material`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`learning_material` (
+  `id_material` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(255) NOT NULL,
+  `description` TEXT NULL DEFAULT NULL,
+  `id_module` INT NOT NULL,
+  `material_type` ENUM('PDF', 'Video', 'Audio', 'Presentación', 'Otro') NOT NULL,
+  `file_url` TEXT NOT NULL,
+  `tags` TEXT NULL DEFAULT NULL,
+  `uploaded_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_material`),
+  INDEX `id_module` (`id_module` ASC) VISIBLE,
+  CONSTRAINT `learning_material_ibfk_1`
+    FOREIGN KEY (`id_module`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`module` (`id_module`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`log_entry`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`log_entry` (
+  `id_entry` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(255) NOT NULL,
+  `id_module` INT NOT NULL,
+  `id_student` INT NOT NULL,
+  `description` TEXT NULL DEFAULT NULL,
+  `time_spent` DECIMAL(5,2) NOT NULL,
+  `attachment_url` TEXT NULL DEFAULT NULL,
+  `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_entry`),
+  INDEX `id_module` (`id_module` ASC) VISIBLE,
+  INDEX `id_student` (`id_student` ASC) VISIBLE,
+  CONSTRAINT `log_entry_ibfk_1`
+    FOREIGN KEY (`id_module`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`module` (`id_module`)
+    ON DELETE CASCADE,
+  CONSTRAINT `log_entry_ibfk_2`
+    FOREIGN KEY (`id_student`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`student` (`id_student`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`login_attempt`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`login_attempt` (
+  `id_login_attempt` INT NOT NULL AUTO_INCREMENT,
+  `email` VARCHAR(255) NULL DEFAULT NULL,
+  `ip_address` VARCHAR(45) NULL DEFAULT NULL,
+  `user_agent` TEXT NULL DEFAULT NULL,
+  `date_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` VARCHAR(20) NULL DEFAULT NULL,
+  `failure_reason` TEXT NULL DEFAULT NULL,
+  `id_user` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`id_login_attempt`),
+  INDEX `id_user` (`id_user` ASC) VISIBLE,
+  CONSTRAINT `login_attempt_ibfk_1`
+    FOREIGN KEY (`id_user`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user` (`id_user`)
+    ON DELETE SET NULL)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`teacher`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`teacher` (
+  `id_teacher` INT NOT NULL AUTO_INCREMENT,
+  `id_user` INT NOT NULL,
+  `name` VARCHAR(100) NULL DEFAULT NULL,
+  `lastname` VARCHAR(100) NULL DEFAULT NULL,
+  `phone_number` VARCHAR(30) NULL DEFAULT NULL,
+  `observations` TEXT NULL DEFAULT NULL,
+  PRIMARY KEY (`id_teacher`),
+  INDEX `id_user` (`id_user` ASC) VISIBLE,
+  CONSTRAINT `teacher_ibfk_1`
+    FOREIGN KEY (`id_user`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user` (`id_user`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`module_teacher`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`module_teacher` (
+  `id_module` INT NOT NULL,
+  `id_teacher` INT NOT NULL,
+  PRIMARY KEY (`id_module`, `id_teacher`),
+  INDEX `id_teacher` (`id_teacher` ASC) VISIBLE,
+  CONSTRAINT `module_teacher_ibfk_1`
+    FOREIGN KEY (`id_module`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`module` (`id_module`)
+    ON DELETE CASCADE,
+  CONSTRAINT `module_teacher_ibfk_2`
+    FOREIGN KEY (`id_teacher`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`teacher` (`id_teacher`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`notification`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`notification` (
+  `id_notification` INT NOT NULL AUTO_INCREMENT,
+  `id_sender` INT NOT NULL,
+  `id_receiver` INT NOT NULL,
+  `title` VARCHAR(255) NOT NULL,
+  `message` TEXT NOT NULL,
+  `type` VARCHAR(50) NULL DEFAULT NULL,
+  `reference_id` INT NULL DEFAULT NULL,
+  `is_viewed` TINYINT(1) NULL DEFAULT '0',
+  `sending_date` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_notification`),
+  INDEX `id_sender` (`id_sender` ASC) VISIBLE,
+  INDEX `id_receiver` (`id_receiver` ASC) VISIBLE,
+  CONSTRAINT `notification_ibfk_1`
+    FOREIGN KEY (`id_sender`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user` (`id_user`)
+    ON DELETE CASCADE,
+  CONSTRAINT `notification_ibfk_2`
+    FOREIGN KEY (`id_receiver`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user` (`id_user`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`notification_settings`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`notification_settings` (
+  `id_notification_settings` INT NOT NULL AUTO_INCREMENT,
+  `send_email_notifications` TINYINT(1) NULL DEFAULT '1',
+  `show_system_notifications` TINYINT(1) NULL DEFAULT '1',
+  `logbook_reminder_days_before` INT NULL DEFAULT NULL,
+  `task_reminder_days_before` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`id_notification_settings`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user_access`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user_access` (
+  `id_access` INT NOT NULL AUTO_INCREMENT,
+  `access_date` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `id_user` INT NOT NULL,
+  PRIMARY KEY (`id_access`),
+  INDEX `id_user` (`id_user` ASC) VISIBLE,
+  CONSTRAINT `user_access_ibfk_1`
+    FOREIGN KEY (`id_user`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user` (`id_user`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`password_recovery`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`password_recovery` (
+  `id_recovery` INT NOT NULL AUTO_INCREMENT,
+  `token` VARCHAR(255) NOT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `expiration_date` TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP + INTERVAL 24 HOUR),
+  `status` VARCHAR(20) NULL DEFAULT NULL,
+  `id_access` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`id_recovery`),
+  INDEX `id_access` (`id_access` ASC) VISIBLE,
+  CONSTRAINT `password_recovery_ibfk_1`
+    FOREIGN KEY (`id_access`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user_access` (`id_access`)
+    ON DELETE SET NULL)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`practice_distribution`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`practice_distribution` (
+  `id_distribution` INT NOT NULL AUTO_INCREMENT,
+  `module_name` VARCHAR(255) NULL DEFAULT NULL,
+  `total_students` INT NULL DEFAULT NULL,
+  `total_hours` INT NULL DEFAULT NULL,
+  `report_date` DATE NULL DEFAULT NULL,
+  PRIMARY KEY (`id_distribution`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`practice_progress`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`practice_progress` (
+  `id_progress` INT NOT NULL AUTO_INCREMENT,
+  `id_student` INT NULL DEFAULT NULL,
+  `module_name` VARCHAR(255) NULL DEFAULT NULL,
+  `date` DATE NULL DEFAULT NULL,
+  `completed_hours` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`id_progress`),
+  INDEX `id_student` (`id_student` ASC) VISIBLE,
+  CONSTRAINT `practice_progress_ibfk_1`
+    FOREIGN KEY (`id_student`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`student` (`id_student`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`query`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`query` (
+  `id_query` INT NOT NULL AUTO_INCREMENT,
+  `id_module` INT NOT NULL,
+  `id_student` INT NOT NULL,
+  `recipient_id` INT NOT NULL,
+  `subject` VARCHAR(255) NOT NULL,
+  `message` TEXT NOT NULL,
+  `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_query`),
+  INDEX `id_module` (`id_module` ASC) VISIBLE,
+  INDEX `id_student` (`id_student` ASC) VISIBLE,
+  INDEX `recipient_id` (`recipient_id` ASC) VISIBLE,
+  CONSTRAINT `query_ibfk_1`
+    FOREIGN KEY (`id_module`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`module` (`id_module`)
+    ON DELETE CASCADE,
+  CONSTRAINT `query_ibfk_2`
+    FOREIGN KEY (`id_student`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`student` (`id_student`)
+    ON DELETE CASCADE,
+  CONSTRAINT `query_ibfk_3`
+    FOREIGN KEY (`recipient_id`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`teacher` (`id_teacher`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`query_response`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`query_response` (
+  `id_response` INT NOT NULL AUTO_INCREMENT,
+  `id_query` INT NOT NULL,
+  `id_teacher` INT NOT NULL,
+  `response_message` TEXT NOT NULL,
+  `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_response`),
+  INDEX `id_query` (`id_query` ASC) VISIBLE,
+  INDEX `id_teacher` (`id_teacher` ASC) VISIBLE,
+  CONSTRAINT `query_response_ibfk_1`
+    FOREIGN KEY (`id_query`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`query` (`id_query`)
+    ON DELETE CASCADE,
+  CONSTRAINT `query_response_ibfk_2`
+    FOREIGN KEY (`id_teacher`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`teacher` (`id_teacher`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`query_attachment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`query_attachment` (
+  `id_attachment` INT NOT NULL AUTO_INCREMENT,
+  `id_query` INT NULL DEFAULT NULL,
+  `id_response` INT NULL DEFAULT NULL,
+  `file_url` TEXT NOT NULL,
+  `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_attachment`),
+  INDEX `id_query` (`id_query` ASC) VISIBLE,
+  INDEX `id_response` (`id_response` ASC) VISIBLE,
+  CONSTRAINT `query_attachment_ibfk_1`
+    FOREIGN KEY (`id_query`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`query` (`id_query`)
+    ON DELETE CASCADE,
+  CONSTRAINT `query_attachment_ibfk_2`
+    FOREIGN KEY (`id_response`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`query_response` (`id_response`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`report_metrics`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`report_metrics` (
+  `id_metrics` INT NOT NULL AUTO_INCREMENT,
+  `total_reports` INT NULL DEFAULT NULL,
+  `active_reports` INT NULL DEFAULT NULL,
+  `scheduled_reports` INT NULL DEFAULT NULL,
+  `custom_reports` INT NULL DEFAULT NULL,
+  `last_updated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_metrics`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`scheduled_report`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`scheduled_report` (
+  `id_scheduled_report` INT NOT NULL AUTO_INCREMENT,
+  `id_report` INT NOT NULL,
+  `schedule_cron` VARCHAR(100) NULL DEFAULT NULL,
+  `next_execution` DATETIME NULL DEFAULT NULL,
+  `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_scheduled_report`),
+  INDEX `id_report` (`id_report` ASC) VISIBLE,
+  CONSTRAINT `scheduled_report_ibfk_1`
+    FOREIGN KEY (`id_report`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`report` (`id_report`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`security_settings`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`security_settings` (
+  `id_security_settings` INT NOT NULL AUTO_INCREMENT,
+  `require_2fa` TINYINT(1) NULL DEFAULT '0',
+  `session_timeout_minutes` INT NULL DEFAULT NULL,
+  `max_login_attempts` INT NULL DEFAULT NULL,
+  `password_min_complexity` VARCHAR(50) NULL DEFAULT NULL,
+  PRIMARY KEY (`id_security_settings`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`session`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`session` (
+  `id_session` INT NOT NULL AUTO_INCREMENT,
+  `ip_address` VARCHAR(45) NULL DEFAULT NULL,
+  `user_agent` TEXT NULL DEFAULT NULL,
+  `date_start` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_end` TIMESTAMP NULL DEFAULT NULL,
+  `status` VARCHAR(20) NULL DEFAULT NULL,
+  `id_user` INT NOT NULL,
+  PRIMARY KEY (`id_session`),
+  INDEX `id_user` (`id_user` ASC) VISIBLE,
+  CONSTRAINT `session_ibfk_1`
+    FOREIGN KEY (`id_user`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user` (`id_user`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`smtp_settings`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`smtp_settings` (
+  `id_smtp_settings` INT NOT NULL AUTO_INCREMENT,
+  `smtp_server` VARCHAR(255) NULL DEFAULT NULL,
+  `smtp_port` INT NULL DEFAULT NULL,
+  `smtp_user` VARCHAR(255) NULL DEFAULT NULL,
+  `smtp_password` TEXT NULL DEFAULT NULL,
+  `use_ssl_tls` TINYINT(1) NULL DEFAULT '1',
+  PRIMARY KEY (`id_smtp_settings`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`student_module`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`student_module` (
+  `id_student` INT NOT NULL,
+  `id_module` INT NOT NULL,
+  `assigned_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` ENUM('Asignado', 'En Progreso', 'Completado') NULL DEFAULT 'Asignado',
+  PRIMARY KEY (`id_student`, `id_module`),
+  INDEX `id_module` (`id_module` ASC) VISIBLE,
+  CONSTRAINT `student_module_ibfk_1`
+    FOREIGN KEY (`id_student`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`student` (`id_student`)
+    ON DELETE CASCADE,
+  CONSTRAINT `student_module_ibfk_2`
+    FOREIGN KEY (`id_module`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`module` (`id_module`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`student_practice_assignment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`student_practice_assignment` (
+  `id_assignment` INT NOT NULL AUTO_INCREMENT,
+  `id_student` INT NOT NULL,
+  `id_company` INT NOT NULL,
+  `id_module` INT NOT NULL,
+  `start_date` DATE NOT NULL,
+  `end_date` DATE NOT NULL,
+  `required_hours` INT NOT NULL,
+  `objectives` TEXT NULL DEFAULT NULL,
+  `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_assignment`),
+  INDEX `id_student` (`id_student` ASC) VISIBLE,
+  INDEX `id_company` (`id_company` ASC) VISIBLE,
+  INDEX `id_module` (`id_module` ASC) VISIBLE,
+  CONSTRAINT `student_practice_assignment_ibfk_1`
+    FOREIGN KEY (`id_student`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`student` (`id_student`)
+    ON DELETE CASCADE,
+  CONSTRAINT `student_practice_assignment_ibfk_2`
+    FOREIGN KEY (`id_company`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`company` (`id_company`)
+    ON DELETE CASCADE,
+  CONSTRAINT `student_practice_assignment_ibfk_3`
+    FOREIGN KEY (`id_module`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`module` (`id_module`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`system_settings`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`system_settings` (
+  `id_settings` INT NOT NULL AUTO_INCREMENT,
+  `institution_name` VARCHAR(255) NULL DEFAULT NULL,
+  `institution_logo` TEXT NULL DEFAULT NULL,
+  `min_practice_duration` INT NULL DEFAULT NULL,
+  `logbook_frequency` INT NULL DEFAULT NULL,
+  `system_description` TEXT NULL DEFAULT NULL,
+  PRIMARY KEY (`id_settings`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`task`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`task` (
+  `id_task` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(255) NOT NULL,
+  `description` TEXT NULL DEFAULT NULL,
+  `id_student` INT NOT NULL,
+  `id_module` INT NOT NULL,
+  `start_date` DATE NOT NULL,
+  `due_date` DATE NOT NULL,
+  `attachment_url` TEXT NULL DEFAULT NULL,
+  `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_task`),
+  INDEX `id_student` (`id_student` ASC) VISIBLE,
+  INDEX `id_module` (`id_module` ASC) VISIBLE,
+  CONSTRAINT `task_ibfk_1`
+    FOREIGN KEY (`id_student`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`student` (`id_student`)
+    ON DELETE CASCADE,
+  CONSTRAINT `task_ibfk_2`
+    FOREIGN KEY (`id_module`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`module` (`id_module`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`task_progress`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`task_progress` (
+  `id_progress` INT NOT NULL AUTO_INCREMENT,
+  `id_task` INT NOT NULL,
+  `id_student` INT NOT NULL,
+  `progress_status` ENUM('En progreso', 'Completada', 'Pendiente', 'En revisión') NOT NULL,
+  `progress_percentage` DECIMAL(5,2) NULL DEFAULT '0.00',
+  `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_progress`),
+  INDEX `id_task` (`id_task` ASC) VISIBLE,
+  INDEX `id_student` (`id_student` ASC) VISIBLE,
+  CONSTRAINT `task_progress_ibfk_1`
+    FOREIGN KEY (`id_task`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`task` (`id_task`)
+    ON DELETE CASCADE,
+  CONSTRAINT `task_progress_ibfk_2`
+    FOREIGN KEY (`id_student`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`student` (`id_student`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`teacher_course`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`teacher_course` (
+  `id_teacher` INT NOT NULL,
+  `id_course` INT NOT NULL,
+  PRIMARY KEY (`id_teacher`, `id_course`),
+  INDEX `id_course` (`id_course` ASC) VISIBLE,
+  CONSTRAINT `teacher_course_ibfk_1`
+    FOREIGN KEY (`id_teacher`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`teacher` (`id_teacher`)
+    ON DELETE CASCADE,
+  CONSTRAINT `teacher_course_ibfk_2`
+    FOREIGN KEY (`id_course`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`course` (`id_course`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`teacher_module`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`teacher_module` (
+  `id_teacher` INT NOT NULL,
+  `id_module` INT NOT NULL,
+  PRIMARY KEY (`id_teacher`, `id_module`),
+  INDEX `id_module` (`id_module` ASC) VISIBLE,
+  CONSTRAINT `teacher_module_ibfk_1`
+    FOREIGN KEY (`id_teacher`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`teacher` (`id_teacher`)
+    ON DELETE CASCADE,
+  CONSTRAINT `teacher_module_ibfk_2`
+    FOREIGN KEY (`id_module`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`module` (`id_module`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Table `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user_profile_picture`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user_profile_picture` (
+  `id_picture` INT NOT NULL AUTO_INCREMENT,
+  `id_user` INT NOT NULL,
+  `picture_url` TEXT NOT NULL,
+  `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_picture`),
+  INDEX `id_user` (`id_user` ASC) VISIBLE,
+  CONSTRAINT `user_profile_picture_ibfk_1`
+    FOREIGN KEY (`id_user`)
+    REFERENCES `ies9021_PPII-SEGUIMIENTO-MECATRONICA`.`user` (`id_user`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
