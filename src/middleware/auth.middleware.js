@@ -11,7 +11,7 @@ export const verifyToken = async (req, res, next) => {
         if (!token) {
             return res.status(401).json({
                 success: false,
-                message: 'No se proporcionó un token de autenticación'
+                message: 'Se requiere iniciar sesión para acceder a este recurso'
             });
         }
 
@@ -21,10 +21,17 @@ export const verifyToken = async (req, res, next) => {
         const sessions = await User.getActiveSessions(decoded.id_user);
         const session = sessions.find(s => s.id_session === decoded.sessionId);
         
-        if (!session || session.status !== 'active') {
+        if (!session) {
             return res.status(401).json({
                 success: false,
-                message: 'Sesión inválida o expirada'
+                message: 'La sesión ha expirado o no es válida'
+            });
+        }
+
+        if (session.status !== 'active') {
+            return res.status(401).json({
+                success: false,
+                message: 'La sesión ha sido cerrada'
             });
         }
 
@@ -35,13 +42,20 @@ export const verifyToken = async (req, res, next) => {
         if (error.name === 'TokenExpiredError') {
             return res.status(401).json({
                 success: false,
-                message: 'Token expirado'
+                message: 'La sesión ha expirado, por favor inicie sesión nuevamente'
+            });
+        }
+        
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({
+                success: false,
+                message: 'Token de autenticación inválido'
             });
         }
         
         return res.status(401).json({
             success: false,
-            message: 'Token inválido'
+            message: 'Error de autenticación'
         });
     }
 };

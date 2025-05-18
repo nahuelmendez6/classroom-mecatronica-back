@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import adminRoutes from './routes/admin.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
+import moduleRoutes from './routes/moduleRoutes.js';
+import courseRoutes from './routes/course.routes.js';
 
 // Configuración de variables de entorno
 dotenv.config();
@@ -27,6 +29,10 @@ app.use('/api/admins', adminRoutes);
 app.use('/api/auth', authRoutes);
 // Todas las rutas de usuarios comenzarán con /api/users
 app.use('/api/users', userRoutes);
+// Todas las rutas de módulos comenzarán con /api/modules
+app.use('/api/modules', moduleRoutes);
+// Todas las rutas de cursos comenzarán con /api/courses
+app.use('/api/courses', courseRoutes);
 
 // Middleware de manejo de errores global
 // Se ejecuta cuando ocurre un error en cualquier parte de la aplicación

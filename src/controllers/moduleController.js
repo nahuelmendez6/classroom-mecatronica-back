@@ -1,0 +1,108 @@
+import Module from '../models/Module.js';
+import { validationResult } from 'express-validator';
+
+class ModuleController {
+    /**
+     * Obtiene todos los módulos
+     * @param {Object} req - Request object
+     * @param {Object} res - Response object
+     */
+    static async getAll(req, res) {
+        try {
+            const modules = await Module.getAll();
+            res.status(200).json({
+                success: true,
+                data: modules
+            });
+        } catch (error) {
+            console.error('Error en getAllModules:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error al obtener módulos',
+                error: error.message
+            });
+        }
+    }
+
+    /**
+     * Crea un nuevo módulo
+     * @param {Object} req - Request object
+     * @param {Object} res - Response object
+     */
+    static async create(req, res) {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Error de validación',
+                    errors: errors.array()
+                });
+            }
+
+            const moduleData = req.body;
+            const result = await Module.create(moduleData);
+
+            res.status(201).json({
+                success: true,
+                message: 'Módulo creado exitosamente',
+                data: result
+            });
+        } catch (error) {
+            console.error('Error en createModule:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error al crear módulo',
+                error: error.message
+            });
+        }
+    }
+
+    /**
+     * Elimina un módulo
+     * @param {Object} req - Request object
+     * @param {Object} res - Response object
+     */
+    static async delete(req, res) {
+        try {
+            const { id } = req.params;
+            await Module.delete(id);
+
+            res.status(200).json({
+                success: true,
+                message: 'Módulo eliminado exitosamente'
+            });
+        } catch (error) {
+            console.error('Error en deleteModule:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error al eliminar módulo',
+                error: error.message
+            });
+        }
+    }
+
+    /**
+     * Obtiene estadísticas de módulos
+     * @param {Object} req - Request object
+     * @param {Object} res - Response object
+     */
+    static async getStats(req, res) {
+        try {
+            const stats = await Module.getStats();
+            res.status(200).json({
+                success: true,
+                data: stats
+            });
+        } catch (error) {
+            console.error('Error en getModuleStats:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error al obtener estadísticas',
+                error: error.message
+            });
+        }
+    }
+}
+
+export default ModuleController; 

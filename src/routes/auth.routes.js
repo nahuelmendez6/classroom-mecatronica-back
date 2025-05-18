@@ -22,5 +22,7 @@ router.post('/login', loginValidation, AuthController.login);
 // Rutas protegidas
 router.post('/logout', verifyToken, AuthController.logout);
 router.get('/sessions', verifyToken, AuthController.getActiveSessions);
+router.post('/close-all-sessions', verifyToken, AuthController.closeAllSessions);
+router.post('/admin/close-sessions-by-email', verifyToken, AuthController.closeAllSessionsByEmail);
 
 export default router; 
