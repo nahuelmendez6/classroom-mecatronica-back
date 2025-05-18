@@ -76,10 +76,10 @@ class User {
         }
     }   
 
-    static async deleteUser(id) {
+    static async deleteUser(id_user) {
         const connection = await pool.getConnection();
         try {
-            const [result] = await connection.query('DELETE FROM user WHERE id = ?', [id]);
+            const [result] = await connection.query('UPDATE user SET is_deleted = 1 WHERE id_user = ?', [id_user]);
             return result.affectedRows > 0; 
         } finally {
             connection.release();
