@@ -83,6 +83,11 @@ router.get('/modules',
     UserController.getAllModules
 );
 
+router.get('/teachers',
+    checkRole(['Administrador']),
+    UserController.getAllTeachers
+)
+
 // Ruta para obtener estadísticas de usuarios
 router.get('/stats',
     checkRole(['Administrador']),
@@ -94,6 +99,7 @@ router.get('/',
     checkRole(['Administrador', 'Profesor']),
     UserController.getAllUsers
 );
+
 
 router.get('/:id_user',
     param('id_user').isInt().withMessage('ID de usuario inválido'),

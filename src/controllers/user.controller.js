@@ -261,6 +261,37 @@ class UserController {
         }
     }
 
+
+        /**
+     * Obtiene a los profesores cargados en el sistema
+     */
+    static async getAllTeachers(req, res) {
+        try {
+            const teachers = await User.getTeachers();
+            // Verify that teachers is an array
+            if (!Array.isArray(teachers)) {
+                throw new Error('La respuesta de la base de datos no es un array de profesores');
+            }
+
+            const teachersWithoutPassword = teachers.map(teacher => {
+                const { password, ...teacherWithoutPassword } = teacher;
+                return teacherWithoutPassword;
+            });
+
+            res.status(200).json({
+                success: true,
+                data: teachersWithoutPassword  // Fixed variable name
+            });
+        } catch (error) {
+            console.error('Error en getAllTeachers:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error al obtener profesores',
+                error: error.message
+            });
+        }
+    }
+
     /**
      * Obtiene un usuario por ID
      * @param {Object} req - Request object

@@ -51,6 +51,21 @@ class User {
         }
     }
 
+    static async getTeachers() {
+        try {
+            const [teachers] = await pool.query(
+                `SELECT u.*, t.id_teacher 
+                 FROM user u 
+                 LEFT JOIN teacher t ON u.id_user = t.id_user 
+                 WHERE u.id_role = 2 AND u.is_deleted = 0`
+            );
+            return teachers;
+        } catch (error) {
+            console.error('Error in getTeachers:', error);
+            throw error;
+        }
+    }
+
     static async updateUser(id, userData) {
         const connection = await pool.getConnection();
         try {

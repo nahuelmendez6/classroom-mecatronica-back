@@ -37,6 +37,9 @@ class Module {
   static async create(moduleData) {
     const { nombre, descripcion, icono, id_profesor, duracion, id_course } = moduleData;
     
+    console.log('Creating module with data:', moduleData);
+    console.log('id_profesor value:', id_profesor, 'type:', typeof id_profesor);
+    
     try {
       await pool.query('START TRANSACTION');
 
@@ -47,22 +50,35 @@ class Module {
       );
 
       const id_module = result.insertId;
+      console.log('Module created with ID:', id_module);
 
       // Asignar profesor si se proporcionó
+      
       if (id_profesor) {
-        await pool.query(
-          'INSERT INTO module_teacher (id_module, id_teacher) VALUES (?, ?)',
-          [id_module, id_profesor]
-        );
+        console.log('Attempting to assign teacher:', id_profesor, 'to module:', id_module);
+        try {
+          const [teacherResult] = await pool.query(
+            'INSERT INTO module_teacher (id_module, id_teacher) VALUES (?, ?)',
+            [id_module, id_profesor]
+          );
+          console.log('Teacher assignment result:', teacherResult);
+        } catch (teacherError) {
+          console.error('Error assigning teacher:', teacherError);
+          throw new Error(`Error al asignar profesor: ${teacherError.message}`);
+        }
+      } else {
+        console.log('No teacher ID provided, skipping teacher assignment');
       }
 
       await pool.query('COMMIT');
+      console.log('Transaction committed successfully');
       return { id: id_module };
     } catch (error) {
+      console.error('Error in module creation:', error);
       await pool.query('ROLLBACK');
       throw new Error('Error al crear el módulo: ' + error.message);
     }
-  }
+  } 
 
   static async delete(id) {
     try {
