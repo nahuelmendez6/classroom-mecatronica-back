@@ -156,4 +156,35 @@ export const deleteCourse = async (req, res) => {
       message: error.message || 'Error al eliminar el curso'
     });
   }
-}; 
+
+};
+
+export const enrollStudent = async (req, res) => {
+
+  try {
+
+    const { courseId, studentId } = req.body;
+
+    if (!courseId || !studentId) {
+
+      return res.status(400).json({
+        success: false,
+        message: 'Faltan datos: courseId y studentId son requeridos'
+      });
+    }
+
+    const result = await Course.enrollStudent(courseId, studentId);
+
+    res.json({
+      success: true,
+      message: 'Estudiante inscrito correctamente',
+      data:result
+    });
+  } catch (error) {
+    console.error('Error in enrollStudent:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error al inscribir al estudiante'
+    });
+  }
+}
