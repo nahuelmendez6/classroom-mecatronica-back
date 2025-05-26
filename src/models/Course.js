@@ -125,42 +125,29 @@ class Course {
   static async enrollStudent(courseId, studentId) {
 
     /**
-     * Metodo para asociar estudiante a curso
+     * Metodo para asociar un estudiante a un curso
      */
 
-    const connection = await pool.getConnection();
-
     try {
-
-      await connection.beginTransaction();
-
-      // verifica que el curso y el alumno existan
-      const [course] = await connection.query('SELECT id_course FROM course WHERE id_course = ?', [courseId]);
-      const [student] = await connection.query('SELECT id_student FROM student WHERE id_student = ?', [studentId])
-
-      if (!course || !student) {
-        throw new Error("Curso o estudiante no encontrado");
+      const [exists] = await pool.query(
+        'SELECT 1 FROM student_course WHERE id_student = ? AND id_course = ?',
+        [studentId, courseId]
+      );
+      if (exists.length > 0) {
+        throw new Error('El estudiante ya está inscrito en este curso');
       }
 
-      // Inserta la relación
-      await connection.query(`
-        INSERT INTO student_course (id_student, id_course) VALUES (?, ?)
-        ON DUPLICATE KEY UPDATE status = 'active'
-      `, [studentId, courseId]
+      await pool.query(
+        'INSERT INTO student_course (id_student, id_course) VALUES (?, ?)',
+        [studentId, courseId]
       );
-
-      await connection.commit();
-      return { id_student: studentId, id_course:courseId};
+      return { id_course: courseId, id_student: studentId };
     } catch (error) {
-      await connection.rollback();
-      throw new Error('Error al inscribir al alumno: ' + error.message);
-    } finally {
-      connection.release();
+      throw new Error('Error al inscribir estudiante en el curso: ' + error.message);
     }
-
   }
 
 
 }
 
-export default Course; 
+export default Course;
