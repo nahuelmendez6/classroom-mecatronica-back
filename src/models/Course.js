@@ -120,6 +120,11 @@ class Course {
       connection.release();
     }
   }
+
+
+  
+
+
 }
 
 export default Course; 
