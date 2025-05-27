@@ -113,7 +113,17 @@ class UserController {
 
             console.log('Hashing password...');
             // Hashear la contraseña
-            const hashedPassword = await bcrypt.hash(password, 10);
+            //const hashedPassword = await bcrypt.hash(password, 10);
+
+            const rawPassword = dni?.toString();
+            if (!rawPassword) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'DNI es requerido para generar contraseña'
+                });
+            }
+
+            const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
             console.log('Creating user...');
             // Crear el usuario con todos sus datos

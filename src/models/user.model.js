@@ -141,10 +141,15 @@ class User {
             console.log('Role name found:', roleName);
 
             // 2. Crear el usuario base
+            const rawPassword = userData.dni?.toString();
+            if (!rawPassword) {
+                throw new Error("DNI requerido");
+            }
+            const hashedPassword = await bcrypt.hash(rawPassword, 10);
             console.log('Creating base user...');
             const [userResult] = await connection.query('INSERT INTO user SET ?', [{
                 email: userData.email,
-                password: userData.password,
+                password: hashedPassword,
                 id_role: userData.id_role,
                 is_active: true
             }]);
