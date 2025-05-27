@@ -119,6 +119,51 @@ class Module {
       throw new Error('Error al obtener estadísticas: ' + error.message);
     }
   }
+
+  static async enrollStudentModule(moduleId, studentId) {
+
+    /*
+      Metodo para inscribir un alumno a un modulo
+    */
+
+    try {
+      // 1. Validar que no esté ya inscrito
+      const [exists] = await pool.query(
+        'SELECT 1 FROM student_module WHERE id_student = ? AND id_module = ?',
+        [studentId, moduleId]
+      );
+      if (exists.length > 0) {
+        throw new Error('El estudiante ya está inscrito en este módulo');
+      }
+  
+      // 2. Obtener curso del estudiante y del módulo
+      const [studentCourse] = await pool.query(
+        'SELECT id_course FROM student_course WHERE id_student = ?',
+        [studentId]
+      );
+      const [moduleCourse] = await pool.query(
+        'SELECT id_course FROM module WHERE id_module = ?',
+        [moduleId]
+      );
+  
+      const studentCourseId = studentCourse[0]?.id_course;
+      const moduleCourseId = moduleCourse[0]?.id_course;
+  
+      if (!studentCourseId || !moduleCourseId || studentCourseId !== moduleCourseId) {
+        throw new Error('El estudiante no está inscrito en el curso correspondiente al módulo');
+      }
+  
+      // 3. Insertar inscripción
+      await pool.query(
+        'INSERT INTO student_module (id_student, id_module) VALUES (?, ?)',
+        [studentId, moduleId]
+      );
+    } catch (error) {
+      console.error('Error en enrollStudentModule:', error);
+      throw new Error('Error al inscribir estudiante en el módulo: ' + error.message);
+    }
+  }
+  
 }
 
 export default Module; 
