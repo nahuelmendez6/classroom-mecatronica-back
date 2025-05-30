@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../../../../practicas/front-seguimiento-practicas"
+		},
+		{
+			"path": "../.."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "front-seguimiento-practicas"
+	}
+}
