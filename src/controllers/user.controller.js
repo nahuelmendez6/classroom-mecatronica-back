@@ -77,7 +77,10 @@ class UserController {
                 phone_number,
                 id_role,
                 id_module,
-                observations
+                observations,
+                id_company,
+                phone,
+                position
             } = req.body;
 
             console.log('Validating passwords match...');
@@ -136,7 +139,10 @@ class UserController {
                 dni,
                 phone_number,
                 id_module,
-                observations
+                observations,
+                id_company,
+                position,
+                phone
             });
 
             console.log('User created successfully with ID:', userId);

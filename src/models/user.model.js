@@ -159,7 +159,7 @@ class User {
             // 3. Crear el registro específico según el rol
             console.log('Creating role-specific record for role:', roleName);
             switch (roleName) {
-                case 'estudiante':
+                case 'estudiante': {
                     console.log('Creating student record...');
                     await connection.query('INSERT INTO student SET ?', [{
                         id_user: userId,
@@ -167,20 +167,24 @@ class User {
                         lastname: userData.lastname,
                         dni: userData.dni,
                         phone_number: userData.phone_number,
-                        observations: userData.observations
+                        observations: userData.observations || null
                     }]);
                     break;
-                case 'profesor':
+                }
+            
+                case 'profesor': {
                     console.log('Creating teacher record...');
                     await connection.query('INSERT INTO teacher SET ?', [{
                         id_user: userId,
                         name: userData.name,
                         lastname: userData.lastname,
                         phone_number: userData.phone_number,
-                        observations: userData.observations
+                        observations: userData.observations || null
                     }]);
                     break;
-                case 'administrador':
+                }
+            
+                case 'administrador': {
                     console.log('Creating admin record...');
                     await connection.query('INSERT INTO admin SET ?', [{
                         id_user: userId,
@@ -188,10 +192,28 @@ class User {
                         lastname: userData.lastname
                     }]);
                     break;
-                default:
+                }
+            
+                case 'tutor': {
+                    console.log('Creating company contact record...');
+                    await connection.query('INSERT INTO company_contact SET ?', [{
+                        id_user: userId,
+                        name: userData.name,
+                        last_name: userData.lastname,
+                        email: userData.email,
+                        position: userData.position,
+                        phone: userData.phone,
+                        id_company: userData.id_company
+                    }]);
+                    break;
+                }
+            
+                default: {
                     console.error('Invalid role name:', roleName);
                     throw new Error('Rol no válido');
+                }
             }
+            
 
             // 4. Si es estudiante y tiene módulo asignado, crear la relación
             if (roleName === 'estudiante' && userData.id_module) {
