@@ -1,6 +1,14 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
 
+
+const roleNamesById = {
+    1: 'administrador',
+    2: 'profesor',
+    3: 'estudiante',
+    4: 'tutor'
+};
+
 /**
  * Middleware para verificar el token JWT
  */
@@ -72,8 +80,13 @@ export const checkRole = (roles) => {
                 message: 'No autenticado'
             });
         }
+        console.log('Usuario autenticado:', req.user);
 
-        if (!roles.includes(req.user.role.name)) {
+        const roleName = req.user.role.name.toLowerCase();
+        console.log('Verificando rol:', roleName, 'vs roles permitidos:', roles);
+
+
+        if (!roles.includes(roleName)) {
             return res.status(403).json({
                 success: false,
                 message: 'No tiene permiso para realizar esta acción'

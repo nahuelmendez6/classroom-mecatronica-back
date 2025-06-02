@@ -42,21 +42,27 @@ router.get('/', ModuleController.getAll);
 
 // POST /api/modules - Crear módulo
 router.post('/',
-    checkRole(['Administrador']),
+    checkRole(['administrador']),
     moduleValidation,
     ModuleController.create
 );
 
 // DELETE /api/modules/:id - Eliminar módulo
 router.delete('/:id',
-    checkRole(['Administrador']),
+    checkRole(['administrador']),
     param('id').isInt().withMessage('ID de módulo inválido'),
     ModuleController.delete
 );
 
+router.post('/enroll',
+    verifyToken,
+    checkRole(['administrador']),
+    ModuleController.enrollStudent
+);
+
 // GET /api/modules/stats - Obtener estadísticas
 router.get('/stats',
-    checkRole(['Administrador']),
+    checkRole(['administrador']),
     ModuleController.getStats
 );
 

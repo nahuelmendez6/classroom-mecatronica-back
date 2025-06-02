@@ -104,6 +104,33 @@ class ModuleController {
         }
     }
 
+    static async enrollStudent (req, res) {
+        try {
+            const { moduleId, studentId } = req.body;
+    
+            if (!moduleId || !studentId) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Faltan datos: moduleId y studentId son requeridos'
+                });
+            }
+    
+            const result = await Module.enrollStudent(moduleId, studentId);
+    
+            res.status(200).json({
+                success: true,
+                message: 'Estudiante inscrito en el módulo correctamente',
+                data: result
+            });
+        } catch (error) {
+            console.error('Error en enrollStudentModule:', error);
+            res.status(500).json({
+                success: false,
+                message: error.message || 'Error al inscribir al estudiante en el módulo'
+            });
+        }
+    }
+
    
 
 

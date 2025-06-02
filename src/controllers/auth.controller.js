@@ -40,7 +40,7 @@ class AuthController {
                     email: user.email,
                     role: {
                         id_role: user.role.id_role,
-                        name: user.role.name
+                        name: user.role.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
                     },
                     sessionId 
                 },

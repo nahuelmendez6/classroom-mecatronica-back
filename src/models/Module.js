@@ -120,7 +120,7 @@ class Module {
     }
   }
 
-  static async enrollStudentModule(moduleId, studentId) {
+  static async enrollStudent(moduleId, studentId) {
 
     /*
       Metodo para inscribir un alumno a un modulo
