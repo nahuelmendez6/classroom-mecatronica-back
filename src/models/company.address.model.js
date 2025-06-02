@@ -1,6 +1,6 @@
-const { DataTypes } = require('sequelize');
-import sequelize from '../config/sequalize';
-const Company = require('./Company');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/sequalize.js';
+import Company from '../models/company.model.js';
 
 const CompanyAddress = sequelize.define('CompanyAddress', {
   id_company_address: {
@@ -37,4 +37,4 @@ const CompanyAddress = sequelize.define('CompanyAddress', {
 Company.hasMany(CompanyAddress, { foreignKey: 'id_company', onDelete: 'CASCADE' });
 CompanyAddress.belongsTo(Company, { foreignKey: 'id_company' });
 
-module.exports = CompanyAddress;
+export default CompanyAddress;

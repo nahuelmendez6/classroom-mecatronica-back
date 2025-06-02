@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../config/sequalize';
+import sequelize from '../config/sequalize.js';
+
 
 const Company = sequelize.define("Company", {
     id_company: {
@@ -30,4 +31,4 @@ const Company = sequelize.define("Company", {
     timestamps: false,
 });
 
-module.exports = Company;
+export default Company;

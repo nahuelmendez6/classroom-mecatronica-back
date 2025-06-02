@@ -7,12 +7,23 @@ import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
 import moduleRoutes from './routes/moduleRoutes.js';
 import courseRoutes from './routes/course.routes.js';
+import companyRoutes from './routes/company.routes.js';
+import companyAddressRoutes from './routes/company.address.routes.js';
+
+import sequelize from './config/sequalize.js';
 
 // Configuración de variables de entorno
 dotenv.config();
 
 // Inicialización de la aplicación Express
 const app = express();
+
+
+sequelize.sync({ alter: false }) // O false si no querés modificar la estructura
+  .then(() => console.log('Modelos sincronizados con la base de datos'))
+  .catch(err => console.error('Error sincronizando modelos:', err));
+
+
 
 // Configuración de middleware
 // CORS: Permite solicitudes desde diferentes orígenes
@@ -25,14 +36,24 @@ app.use(express.urlencoded({ extended: true }));
 // Configuración de rutas
 // Todas las rutas de administradores comenzarán con /api/admins
 app.use('/api/admins', adminRoutes);
+
 // Todas las rutas de autenticacion comenzarán con /api/auth'
 app.use('/api/auth', authRoutes);
+
 // Todas las rutas de usuarios comenzarán con /api/users
 app.use('/api/users', userRoutes);
+
 // Todas las rutas de módulos comenzarán con /api/modules
 app.use('/api/modules', moduleRoutes);
+
 // Todas las rutas de cursos comenzarán con /api/courses
 app.use('/api/courses', courseRoutes);
+
+// Todas las rutas de empresas comenzaran con /api/empresa
+app.use('/api/companies', companyRoutes);
+
+// Todas las rutas de direcciones comenzaran con /api/address
+app.use('/api/address/', companyAddressRoutes);
 
 // Middleware de manejo de errores global
 // Se ejecuta cuando ocurre un error en cualquier parte de la aplicación
