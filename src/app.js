@@ -9,8 +9,11 @@ import moduleRoutes from './routes/moduleRoutes.js';
 import courseRoutes from './routes/course.routes.js';
 import companyRoutes from './routes/company.routes.js';
 import companyAddressRoutes from './routes/company.address.routes.js';
+import studentPracticeRoutes from './routes/studentPracticeAssignment.routes.js';
 
 import sequelize from './config/sequalize.js';
+
+import './models/index.js';
 
 // Configuración de variables de entorno
 dotenv.config();
@@ -54,6 +57,11 @@ app.use('/api/companies', companyRoutes);
 
 // Todas las rutas de direcciones comenzaran con /api/address
 app.use('/api/address/', companyAddressRoutes);
+
+
+// Todas las rutas de asignacion de practicas
+app.use('/api/practice-assignments', studentPracticeRoutes);
+
 
 // Middleware de manejo de errores global
 // Se ejecuta cuando ocurre un error en cualquier parte de la aplicación

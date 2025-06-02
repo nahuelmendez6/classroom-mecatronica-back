@@ -1,5 +1,5 @@
-import { pool } from "../../config/database";
-import bcrypt from "bcryptjs/dist/bcrypt";
+import { pool } from "../../config/database.js";
+import bcrypt from "bcryptjs/dist/bcrypt.js";
 
 /**
  * Clase que maneja las operaciones de base de datos relacionadas con los profesores
@@ -44,3 +44,5 @@ class Teacher {
     }
 
 }
+
+export default Teacher;

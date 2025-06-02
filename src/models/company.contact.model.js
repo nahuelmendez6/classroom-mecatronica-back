@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../config/database.js';
+import sequelize from '../config/sequalize.js';
 import User from './user.model.js';
 import Company from './company.model.js';
 
@@ -45,15 +45,6 @@ const CompanyContact = sequelize.define('CompanyContact', {
   timestamps: false
 });
 
-// Asociaciones
-CompanyContact.belongsTo(User, {
-  foreignKey: 'id_user',
-  onDelete: 'CASCADE'
-});
 
-CompanyContact.belongsTo(Company, {
-  foreignKey: 'id_company',
-  onDelete: 'CASCADE'
-});
 
 export default CompanyContact;
