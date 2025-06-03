@@ -1,4 +1,4 @@
-import Module from '../models/Module.js';
+import Module from '../models/module.model.js';
 import { validationResult } from 'express-validator';
 
 class ModuleController {

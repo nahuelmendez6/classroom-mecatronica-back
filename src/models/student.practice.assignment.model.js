@@ -1,11 +1,9 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../config/sequalize.js';
-
+import sequelize from '../config/sequalize.js';  // fijate que corregí el nombre
 
 import Student from './student.model.js';
 import Company from './company.model.js';
-import Module from './module.model.js';
-
+// import Module from './module.model.js';  // No importes aquí
 
 const StudentPracticeAssignment = sequelize.define('StudentPracticeAssignment', {
   id_assignment: {
@@ -17,7 +15,7 @@ const StudentPracticeAssignment = sequelize.define('StudentPracticeAssignment', 
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: Student,
+      model: 'student',  // nombre de la tabla, en minúsculas y singular/plural según la tabla real
       key: 'id_student'
     },
     onDelete: 'CASCADE'
@@ -26,7 +24,7 @@ const StudentPracticeAssignment = sequelize.define('StudentPracticeAssignment', 
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: Company,
+      model: 'company',
       key: 'id_company'
     },
     onDelete: 'CASCADE'
@@ -35,7 +33,7 @@ const StudentPracticeAssignment = sequelize.define('StudentPracticeAssignment', 
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: Module,
+      model: 'module',  // ¡usa string con el nombre de la tabla!
       key: 'id_module'
     },
     onDelete: 'CASCADE'
@@ -65,15 +63,6 @@ const StudentPracticeAssignment = sequelize.define('StudentPracticeAssignment', 
   timestamps: false
 });
 
-
-// DEFINICIÓN DE RELACIONES 
-Student.hasMany(StudentPracticeAssignment, { foreignKey: 'id_student', onDelete: 'CASCADE' });
-Company.hasMany(StudentPracticeAssignment, { foreignKey: 'id_company', onDelete: 'CASCADE' });
-// Module.hasMany(StudentPracticeAssignment, { foreignKey: 'id_module', onDelete: 'CASCADE' });
-
-StudentPracticeAssignment.belongsTo(Student, { foreignKey: 'id_student' });
-StudentPracticeAssignment.belongsTo(Company, { foreignKey: 'id_company' });
-// StudentPracticeAssignment.belongsTo(Module, { foreignKey: 'id_module' });
-
+// Las relaciones las definís luego en index.js, no acá.
 
 export default StudentPracticeAssignment;

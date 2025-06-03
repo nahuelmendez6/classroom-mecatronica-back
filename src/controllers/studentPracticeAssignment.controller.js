@@ -1,7 +1,7 @@
 import StudentPracticeAssignment from '../models/student.practice.assignment.model.js';
 import Student from '../models/student.model.js';
 import Company from '../models/company.model.js';
-import Module from '../models/Module.js';
+import Module from '../models/module.model.js';
 
 // Crear una asignación de práctica
 export const createAssignment = async (req, res) => {
