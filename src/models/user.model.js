@@ -2,6 +2,11 @@ import bcrypt from 'bcryptjs';
 import { Sequelize, DataTypes, Op } from 'sequelize';
 import sequelize from '../config/sequalize.js';
 
+import SessionService from '../services/session.service.js';
+import Role from './role.model.js';
+import Module from './module.model.js';
+import CompanyContact from "./company.contact.model.js";
+
 const User = sequelize.define('User', {
   id_user: {
     type: DataTypes.INTEGER,
@@ -17,21 +22,31 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  id_role: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
   is_active: {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
+  },
+  created_at: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+  updated_at: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+  id_role: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
   },
   is_deleted: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
-  last_login: {
+  deleted_at: {
     type: DataTypes.DATE,
+    defaultValue: null,
   }
+
 }, {
   tableName: 'user',
   timestamps: false,
@@ -198,8 +213,6 @@ User.getAllRoles = async function() {
 };
 
 User.getAllModules = async function() {
-  // Asumo que tienes modelo Module
-  const Module = (await import('./module.model.js')).default;
   return await Module.findAll({ where: { is_active: true } });
 };
 
@@ -211,7 +224,7 @@ User.updateLastLogin = async function(id) {
 User.authenticateAndCreateSession = async function(email, password, sessionInfo) {
   const user = await User.findOne({ where: { email, is_active: true } });
   
-  await Session.recordLoginAttempt({
+  await SessionService.recordLoginAttempt({
     email,
     ip_address: sessionInfo.ip_address,
     user_agent: sessionInfo.user_agent,
@@ -224,7 +237,7 @@ User.authenticateAndCreateSession = async function(email, password, sessionInfo)
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
-    await Session.recordLoginAttempt({
+    await SessionService.recordLoginAttempt({
       email,
       ip_address: sessionInfo.ip_address,
       user_agent: sessionInfo.user_agent,
@@ -235,11 +248,11 @@ User.authenticateAndCreateSession = async function(email, password, sessionInfo)
     throw new Error('Contraseña incorrecta');
   }
 
-  if (await Session.hasTooManyActiveSessions(user.id_user)) {
+  if (await SessionService.hasTooManyActiveSessions(user.id_user)) {
     throw new Error('Demasiadas sesiones activas');
   }
 
-  const sessionId = await Session.createSession({
+  const sessionId = await SessionService.createSession({
     id_user: user.id_user,
     ip_address: sessionInfo.ip_address,
     user_agent: sessionInfo.user_agent

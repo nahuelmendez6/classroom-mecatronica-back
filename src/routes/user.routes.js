@@ -68,42 +68,42 @@ router.post('/',
             return true;
         })
     ],
-    checkRole(['Administrador']),
+    checkRole(['administrador']),
     UserController.createUser
 );
 
 // Rutas para obtener roles y módulos
 router.get('/roles',
-    checkRole(['Administrador']),
+    checkRole(['administrador']),
     UserController.getAllRoles
 );
 
 router.get('/modules',
-    checkRole(['Administrador']),
+    checkRole(['administrador']),
     UserController.getAllModules
 );
 
 router.get('/teachers',
-    checkRole(['Administrador']),
+    checkRole(['administrador']),
     UserController.getAllTeachers
 )
 
 // Ruta para obtener estadísticas de usuarios
 router.get('/stats',
-    checkRole(['Administrador']),
+    checkRole(['administrador']),
     UserController.getUserStats
 );
 
 // Rutas que requieren rol de administrador o profesor
 router.get('/',
-    checkRole(['Administrador', 'Profesor']),
+    checkRole(['administrador', 'Profesor']),
     UserController.getAllUsers
 );
 
 
 router.get('/:id_user',
     param('id_user').isInt().withMessage('ID de usuario inválido'),
-    checkRole(['Administrador', 'Profesor']),
+    checkRole(['administrador', 'Profesor']),
     UserController.getUserById
 );
 
@@ -118,13 +118,13 @@ router.put('/:id_user',
         roleValidation.optional(),
         moduleValidation.optional()
     ],
-    checkRole(['Administrador']),
+    checkRole(['administrador']),
     UserController.updateUser
 );
 
 router.delete('/:id_user',
     param('id_user').isInt().withMessage('ID de usuario inválido'),
-    checkRole(['Administrador']),
+    checkRole(['administrador']),
     UserController.deleteUser
 );
 

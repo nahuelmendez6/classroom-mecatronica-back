@@ -15,6 +15,8 @@ import sequelize from './config/sequalize.js';
 
 import './models/index.js';
 
+
+
 // Configuración de variables de entorno
 dotenv.config();
 

@@ -12,61 +12,24 @@ const roleNamesById = {
 /**
  * Middleware para verificar el token JWT
  */
-export const verifyToken = async (req, res, next) => {
-    try {
-        const token = req.headers.authorization?.split(' ')[1];
-        
-        if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: 'Se requiere iniciar sesión para acceder a este recurso'
-            });
-        }
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        // Verificar si la sesión sigue activa
-        const sessions = await User.getActiveSessions(decoded.id_user);
-        const session = sessions.find(s => s.id_session === decoded.sessionId);
-        
-        if (!session) {
-            return res.status(401).json({
-                success: false,
-                message: 'La sesión ha expirado o no es válida'
-            });
-        }
-
-        if (session.status !== 'active') {
-            return res.status(401).json({
-                success: false,
-                message: 'La sesión ha sido cerrada'
-            });
-        }
-
-        // Agregar información del usuario al request
-        req.user = decoded;
-        next();
-    } catch (error) {
-        if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({
-                success: false,
-                message: 'La sesión ha expirado, por favor inicie sesión nuevamente'
-            });
-        }
-        
-        if (error.name === 'JsonWebTokenError') {
-            return res.status(401).json({
-                success: false,
-                message: 'Token de autenticación inválido'
-            });
-        }
-        
-        return res.status(401).json({
-            success: false,
-            message: 'Error de autenticación'
-        });
+export const verifyToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+  
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ success: false, message: 'Token no proporcionado' });
     }
-};
+  
+    const token = authHeader.split(' ')[1];
+  
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = decoded;
+      next();
+    } catch (err) {
+      return res.status(403).json({ success: false, message: 'Error de autenticación' });
+    }
+  };
+  
 
 /**
  * Middleware para verificar roles
