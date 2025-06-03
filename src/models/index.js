@@ -14,7 +14,8 @@ import StudentPracticeAssignment from './student.practice.assignment.model.js';
 import Module from './module.model.js';
 import Session from './session.model.js';
 import LearningMaterial from './learning.material.js';
-import ModuleTeacher from './module.teacher.model.js';  // no estaba en tu código, pero veo que usas
+import ModuleTeacher from './module.teacher.model.js';
+import LoginAttempt from './login.attempt.model.js';
 
 // RELACIONES (sólo después de importar todo)
 
@@ -23,6 +24,8 @@ User.hasOne(Student, { foreignKey: 'id_user' });
 User.hasOne(Teacher, { foreignKey: 'id_user' });
 User.hasOne(Admin, { foreignKey: 'id_user' });
 User.hasOne(CompanyContact, { foreignKey: 'id_user' });
+User.hasMany(Session, { foreignKey: 'id_user' });
+User.hasMany(LoginAttempt, { foreignKey: 'id_user' });
 
 Student.belongsTo(User, { foreignKey: 'id_user' });
 Student.hasMany(StudentModule, { foreignKey: 'id_student' });
@@ -55,6 +58,7 @@ Module.hasMany(StudentModule, { foreignKey: 'id_module' });
 Module.hasMany(StudentPracticeAssignment, { foreignKey: 'id_module' });
 
 Session.belongsTo(User, { foreignKey: 'id_user' });
+LoginAttempt.belongsTo(User, { foreignKey: 'id_user' });
 
 Course.hasMany(Module, { foreignKey: 'id_course' });
 Module.belongsTo(Course, { foreignKey: 'id_course' });
@@ -103,5 +107,6 @@ export {
   Session,
   Course,
   LearningMaterial,
-  ModuleTeacher
+  ModuleTeacher,
+  LoginAttempt
 };
