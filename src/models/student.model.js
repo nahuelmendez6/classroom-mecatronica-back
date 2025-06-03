@@ -1,7 +1,6 @@
 // src/models/student.model.js
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/sequalize.js';
-import User from './user.model.js';
 
 const Student = sequelize.define('Student', {
   id_student: {
@@ -11,12 +10,7 @@ const Student = sequelize.define('Student', {
   },
   id_user: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: User,
-      key: 'id_user'
-    },
-    onDelete: 'CASCADE'
+    allowNull: false
   },
   name: {
     type: DataTypes.STRING,

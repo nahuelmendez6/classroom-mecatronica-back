@@ -1,7 +1,5 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/sequalize.js';
-import User from './user.model.js';
-import Company from './company.model.js';
 
 const CompanyContact = sequelize.define('CompanyContact', {
   id_contact: {
@@ -34,21 +32,11 @@ const CompanyContact = sequelize.define('CompanyContact', {
   },
   id_user: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: User,
-      key: 'id_user'
-    },
-    onDelete: 'CASCADE'
+    allowNull: false
   },
   id_company: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Company,
-      key: 'id_company'
-    },
-    onDelete: 'CASCADE'
+    allowNull: false
   }
 }, {
   tableName: 'company_contact',

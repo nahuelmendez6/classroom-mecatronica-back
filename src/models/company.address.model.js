@@ -1,6 +1,5 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/sequalize.js';
-import Company from '../models/company.model.js';
 
 const CompanyAddress = sequelize.define('CompanyAddress', {
   id_company_address: {
@@ -22,19 +21,11 @@ const CompanyAddress = sequelize.define('CompanyAddress', {
   },
   id_company: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Company,
-      key: 'id_company',
-    },
-    onDelete: 'CASCADE',
+    allowNull: false
   },
 }, {
   tableName: 'company_address',
   timestamps: false,
 });
-
-Company.hasMany(CompanyAddress, { foreignKey: 'id_company', onDelete: 'CASCADE' });
-CompanyAddress.belongsTo(Company, { foreignKey: 'id_company' });
 
 export default CompanyAddress;

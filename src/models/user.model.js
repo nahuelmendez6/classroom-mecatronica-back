@@ -1,13 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { Sequelize, DataTypes, Op } from 'sequelize';
 import sequelize from '../config/sequalize.js';
-import Role from './role.model.js';
-import Student from './student.model.js';
-import Teacher from './teacher.model.js';
-import Admin from './admin.model.js';
-import CompanyContact from './company.contact.model.js';
-import StudentModule from './student_module.model.js';
-import Session from './session.model.js';
 
 const User = sequelize.define('User', {
   id_user: {
@@ -43,14 +36,6 @@ const User = sequelize.define('User', {
   tableName: 'user',
   timestamps: false,
 });
-
-// Relaciones (associations)
-User.belongsTo(Role, { foreignKey: 'id_role' });
-User.hasOne(Student, { foreignKey: 'id_user' });
-User.hasOne(Teacher, { foreignKey: 'id_user' });
-User.hasOne(Admin, { foreignKey: 'id_user' });
-User.hasOne(CompanyContact, { foreignKey: 'id_user' });
-StudentModule.belongsTo(User, { foreignKey: 'id_student' });
 
 /**
  * Métodos estáticos para el modelo User
