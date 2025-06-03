@@ -34,17 +34,25 @@ const CompanyContact = sequelize.define('CompanyContact', {
   },
   id_user: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
+    references: {
+      model: User,
+      key: 'id_user'
+    },
+    onDelete: 'CASCADE'
   },
   id_company: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
+    references: {
+      model: Company,
+      key: 'id_company'
+    },
+    onDelete: 'CASCADE'
   }
 }, {
   tableName: 'company_contact',
   timestamps: false
 });
-
-
 
 export default CompanyContact;

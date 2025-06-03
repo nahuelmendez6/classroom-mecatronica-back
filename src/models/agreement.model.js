@@ -1,6 +1,6 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../db');
-const Company = require('./Company');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/sequalize.js';
+import Company from './company.model.js';
 
 const Agreement = sequelize.define('Agreement', {
   id_agreement: {
@@ -36,4 +36,4 @@ const Agreement = sequelize.define('Agreement', {
 Company.hasMany(Agreement, { foreignKey: 'id_company', onDelete: 'CASCADE' });
 Agreement.belongsTo(Company, { foreignKey: 'id_company' });
 
-module.exports = Agreement;
+export default Agreement;

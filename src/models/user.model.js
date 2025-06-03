@@ -45,12 +45,12 @@ const User = sequelize.define('User', {
 });
 
 // Relaciones (associations)
-// User.belongsTo(Role, { foreignKey: 'id_role' });
-// User.hasOne(Student, { foreignKey: 'id_user' });
-// User.hasOne(Teacher, { foreignKey: 'id_user' });
-// User.hasOne(Admin, { foreignKey: 'id_user' });
-// User.hasOne(CompanyContact, { foreignKey: 'id_user' });
-// StudentModule.belongsTo(User, { foreignKey: 'id_student' });
+User.belongsTo(Role, { foreignKey: 'id_role' });
+User.hasOne(Student, { foreignKey: 'id_user' });
+User.hasOne(Teacher, { foreignKey: 'id_user' });
+User.hasOne(Admin, { foreignKey: 'id_user' });
+User.hasOne(CompanyContact, { foreignKey: 'id_user' });
+StudentModule.belongsTo(User, { foreignKey: 'id_student' });
 
 /**
  * Métodos estáticos para el modelo User

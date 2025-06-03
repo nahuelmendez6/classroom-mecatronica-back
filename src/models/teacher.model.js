@@ -1,48 +1,44 @@
-import { pool } from "../../config/database.js";
-import bcrypt from "bcryptjs/dist/bcrypt.js";
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/sequalize.js';
+import User from './user.model.js';
 
-/**
- * Clase que maneja las operaciones de base de datos relacionadas con los profesores
- */
-class Teacher {
+const Teacher = sequelize.define('Teacher', {
+  id_teacher: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  id_user: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: User,
+      key: 'id_user'
+    },
+    onDelete: 'CASCADE'
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  lastname: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  phone_number: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  observations: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  }
+}, {
+  tableName: 'teacher',
+  timestamps: false
+});
 
-
-    static async create(teacherData) {
-        const connection = await pool.getConnection();
-
-        try {
-            await connection.beginTransaction();
-
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(teacherData.password, salt);
-
-            const [userResult] = await connection.query(
-                'INSERT INTO user (email, password, name, lastname, id_role) VALUES (?, ?, ?, ?, 2)',
-                [teacherData.email, hashedPassword, teacherData.name, teacherData.lastname]
-            )
-
-            const [teacherResult] = await connection.query(
-                'INSERT INTO teacher (id_user) VALUES (?)',
-                [userResult.insertId]
-            )
-
-            await connection.commit();
-
-            return {
-                id: userResult.insertId,
-                ...teacherData,
-                password: undefined // No devolver la contraseña
-            };
-
-        } catch (error) {
-            await connection.rollback();
-            throw error;
-        } finally {
-            connection.release();
-        }
-
-    }
-
-}
+Teacher.belongsTo(User, { foreignKey: 'id_user' });
+User.hasOne(Teacher, { foreignKey: 'id_user' });
 
 export default Teacher;

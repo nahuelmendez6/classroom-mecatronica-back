@@ -4,7 +4,7 @@ import sequelize from '../config/sequalize.js';
 
 import Student from './student.model.js';
 import Company from './company.model.js';
-import Module from './Module.js';
+import Module from './module.model.js';
 
 
 const StudentPracticeAssignment = sequelize.define('StudentPracticeAssignment', {
@@ -15,15 +15,30 @@ const StudentPracticeAssignment = sequelize.define('StudentPracticeAssignment', 
   },
   id_student: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
+    references: {
+      model: Student,
+      key: 'id_student'
+    },
+    onDelete: 'CASCADE'
   },
   id_company: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
+    references: {
+      model: Company,
+      key: 'id_company'
+    },
+    onDelete: 'CASCADE'
   },
   id_module: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
+    references: {
+      model: Module,
+      key: 'id_module'
+    },
+    onDelete: 'CASCADE'
   },
   start_date: {
     type: DataTypes.DATEONLY,
