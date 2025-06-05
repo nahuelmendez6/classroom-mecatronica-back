@@ -6,6 +6,7 @@ import SessionService from '../services/session.service.js';
 import Role from './role.model.js';
 import Module from './module.model.js';
 import CompanyContact from "./company.contact.model.js";
+import Admin from './admin.model.js';
 
 const User = sequelize.define('User', {
   id_user: {

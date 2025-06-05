@@ -1,6 +1,5 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/sequalize.js';
-import User from './user.model.js';
 
 const Admin = sequelize.define('Admin', {
   id_admin: {
@@ -10,19 +9,27 @@ const Admin = sequelize.define('Admin', {
   },
   id_user: {
     type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: User,
-      key: 'id_user'
-    },
-    onDelete: 'CASCADE'
+    allowNull: false
+  },
+  name: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  lastname: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  is_deleted: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  deleted_at: {
+    type: DataTypes.DATE,
+    allowNull: true
   }
 }, {
   tableName: 'admin',
   timestamps: false
 });
 
-Admin.belongsTo(User, { foreignKey: 'id_user' });
-User.hasOne(Admin, { foreignKey: 'id_user' });
-
-export default Admin; 
+export default Admin;
