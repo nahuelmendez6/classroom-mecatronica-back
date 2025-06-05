@@ -7,6 +7,8 @@ import Role from './role.model.js';
 import Module from './module.model.js';
 import CompanyContact from "./company.contact.model.js";
 import Admin from './admin.model.js';
+import Teacher from './teacher.model.js';
+import Student from './student.model.js'; 
 
 const User = sequelize.define('User', {
   id_user: {
