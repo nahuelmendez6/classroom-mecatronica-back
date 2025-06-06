@@ -93,44 +93,52 @@ User.deleteUser = async function(id_user) {
   return affectedRows > 0;
 };
 
-User.getAllUsers = async function() {
-  // Construimos el query con includes y atributos personalizados
-  // Sequelize no hace CASE en includes fácilmente, así que podemos usar raw queries o mapear después.
-
-  // Usaré raw query para simplificar:
-  const query = `
-    SELECT 
+User.getAllUsers = async function () {
+  const [results] = await sequelize.query(`
+    SELECT
       u.id_user,
       u.email,
-      u.is_active,
-      r.name as role_name,
-      CASE r.name
-          WHEN 'Estudiante' THEN s.name
-          WHEN 'Profesor' THEN t.name
-          WHEN 'Administrador' THEN a.name
-      END as name,
-      CASE r.name
-          WHEN 'Estudiante' THEN s.lastname
-          WHEN 'Profesor' THEN t.lastname
-          WHEN 'Administrador' THEN a.lastname
-      END as lastname,
-      s.dni,
-      CASE r.name
-          WHEN 'Estudiante' THEN s.observations
-          WHEN 'Profesor' THEN t.observations
-          ELSE NULL
-      END as observations
+      u.password,
+      u.is_active,        -- <-- agregado
+      u.is_deleted,
+      r.name AS role,
+      CASE
+        WHEN r.name = 'Estudiante' THEN s.name
+        WHEN r.name = 'Profesor' THEN t.name
+        WHEN r.name = 'Administrador' THEN a.name
+        ELSE NULL
+      END AS name,
+      CASE
+        WHEN r.name = 'Estudiante' THEN s.lastname
+        WHEN r.name = 'Profesor' THEN t.lastname
+        WHEN r.name = 'Administrador' THEN a.lastname
+        ELSE NULL
+      END AS lastname,
+      CASE
+        WHEN r.name = 'Estudiante' THEN s.dni
+        ELSE NULL
+      END AS dni,
+      CASE
+        WHEN r.name = 'Estudiante' THEN s.observations
+        WHEN r.name = 'Profesor' THEN t.observations
+        ELSE NULL
+      END AS observations
     FROM user u
-    LEFT JOIN role r ON u.id_role = r.id_role
+    JOIN role r ON u.id_role = r.id_role
     LEFT JOIN student s ON u.id_user = s.id_user
     LEFT JOIN teacher t ON u.id_user = t.id_user
     LEFT JOIN admin a ON u.id_user = a.id_user
+    WHERE u.is_deleted = false
     ORDER BY u.id_user DESC
-  `;
+  `);
 
-  const [results] = await sequelize.query(query, { type: Sequelize.QueryTypes.SELECT });
+  console.log(results); // para confirmar si vienen is_active y role bien
+
   return results;
 };
+
+
+
 
 User.createUser = async function(userData) {
   return await sequelize.transaction(async (t) => {
@@ -288,7 +296,7 @@ User.getUserStats = async function() {
         COUNT(*) as totalUsers,
         SUM(CASE WHEN r.name = 'Estudiante' THEN 1 ELSE 0 END) as totalStudents,
         SUM(CASE WHEN r.name = 'Profesor' THEN 1 ELSE 0 END) as totalTeachers,
-        SUM(CASE WHEN r.name = 'Tutor Empresa' THEN 1 ELSE 0 END) as totalTutors,
+        SUM(CASE WHEN r.name = 'Tutor' THEN 1 ELSE 0 END) as totalTutors,
         SUM(CASE WHEN r.name = 'Administrador' THEN 1 ELSE 0 END) as totalAdmins
     FROM user u
     JOIN role r ON u.id_role = r.id_role

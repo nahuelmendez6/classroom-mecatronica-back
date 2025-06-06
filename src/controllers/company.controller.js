@@ -1,5 +1,11 @@
 import Company from "../models/company.model.js"
 import { validationResult } from 'express-validator';
+import CompanyContact from "../models/company.contact.model.js";
+import User from "../models/user.model.js";
+import CompanyAddress from "../models/company.address.model.js";
+
+
+import sequelize from '../config/sequalize.js';
 
 export const createCompany = async (req, res) => {
     try {
@@ -179,3 +185,75 @@ export const deleteCompany = async (req, res) => {
     }
 };
 
+export const createCompanyWithAddressAndContact = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Error de validación',
+        errors: errors.array()
+      });
+    }
+  
+    const {
+      name,
+      cuit,
+      street,
+      number,
+      city,
+      department,
+      contact_name,
+      contact_last_name,
+      contact_email,
+      contact_position,
+      contact_phone
+    } = req.body;
+  
+    const transaction = await sequelize.transaction();
+  
+    try {
+      // Crear empresa
+      const company = await Company.create({ name, cuit }, { transaction });
+  
+      // Crear dirección
+      const address = await CompanyAddress.create({
+        street,
+        number,
+        city,
+        department,
+        id_company: company.id
+      }, { transaction });
+  
+      // Crear usuario/contacto
+      const user = await User.createUser({
+        email: contact_email,
+        name: contact_name,
+        lastname: contact_last_name,
+        id_role: 4,
+        id_company: company.id,
+        position: contact_position,
+        phone: contact_phone
+      }, transaction); // Asegurate que `createUser` acepte transaction como segundo parámetro
+  
+      await transaction.commit();
+  
+      return res.status(201).json({
+        success: true,
+        message: 'Empresa, dirección y contacto creados correctamente',
+        data: {
+          company,
+          address,
+          user_id: user
+        }
+      });
+  
+    } catch (error) {
+      await transaction.rollback();
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: 'Error al crear empresa completa',
+        error: error.message
+      });
+    }
+  };
