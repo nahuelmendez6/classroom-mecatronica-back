@@ -66,7 +66,7 @@ class TeacherController {
      */
     static async getAll(req, res) {
         try {
-            const teachers = await Teacher.getAll();
+            const teachers = await Teacher.findAll();
             res.json({
                 success: true,
                 data: teachers

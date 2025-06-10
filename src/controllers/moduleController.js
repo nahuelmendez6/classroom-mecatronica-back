@@ -1,6 +1,8 @@
 import Module from '../models/module.model.js';
 import { validationResult } from 'express-validator';
 
+import multer from 'multer';
+import upload from
 class ModuleController {
     /**
      * Obtiene todos los módulos
@@ -31,9 +33,12 @@ class ModuleController {
      */
     static async create(req, res) {
         try {
+            console.log(req.body);
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
+                console.log(errors)
                 return res.status(400).json({
+                    
                     success: false,
                     message: 'Error de validación',
                     errors: errors.array()

@@ -10,6 +10,7 @@ import courseRoutes from './routes/course.routes.js';
 import companyRoutes from './routes/company.routes.js';
 import companyAddressRoutes from './routes/company.address.routes.js';
 import studentPracticeRoutes from './routes/studentPracticeAssignment.routes.js';
+import teacherRoutes from './routes/teacher.routes.js';
 
 import sequelize from './config/sequalize.js';
 
@@ -60,6 +61,8 @@ app.use('/api/companies', companyRoutes);
 // Todas las rutas de direcciones comenzaran con /api/address
 app.use('/api/address/', companyAddressRoutes);
 
+// Todas las rutas de profesores
+app.use('/api/teachers', teacherRoutes)
 
 // Todas las rutas de asignacion de practicas
 app.use('/api/practice-assignments', studentPracticeRoutes);
