@@ -1,8 +1,8 @@
 import Module from '../models/module.model.js';
 import { validationResult } from 'express-validator';
 
-import multer from 'multer';
-import upload from
+// import multer from 'multer';
+// import upload from
 class ModuleController {
     /**
      * Obtiene todos los módulos
