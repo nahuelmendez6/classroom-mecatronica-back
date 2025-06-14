@@ -16,6 +16,7 @@ import Session from './session.model.js';
 import LearningMaterial from './learning.material.js';
 import ModuleTeacher from './module.teacher.model.js';
 import LoginAttempt from './login.attempt.model.js';
+import SubModule from './sub.module.model.js';
 
 // RELACIONES (sólo después de importar todo)
 
@@ -62,6 +63,17 @@ LoginAttempt.belongsTo(User, { foreignKey: 'id_user' });
 
 Course.hasMany(Module, { foreignKey: 'id_course' });
 Module.belongsTo(Course, { foreignKey: 'id_course' });
+Module.hasMany(SubModule, {
+  foreignKey: 'id_module',
+  as: 'submodules',
+  onDelete: 'CASCADE'
+});
+
+SubModule.belongsTo(Module, { 
+  foreignKey: 'id_module',
+  as: 'module',
+  onDelete: 'CASCADE'
+});
 
 Module.hasMany(StudentModule, { foreignKey: 'id_module' });
 StudentModule.belongsTo(Module, { foreignKey: 'id_module' });
@@ -108,5 +120,6 @@ export {
   Course,
   LearningMaterial,
   ModuleTeacher,
-  LoginAttempt
+  LoginAttempt,
+  SubModule,
 };
