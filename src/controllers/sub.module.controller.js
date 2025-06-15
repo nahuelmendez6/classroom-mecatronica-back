@@ -41,8 +41,13 @@ export const createSubModule = async (req, res) => {
       id_module
     });
 
-    res.status(201).json(newSubModule);
+    res.status(201).json({
+        success: true,
+        message: 'Submódulo creado correctamente',
+        data: newSubModule
+      });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Error al crear el submódulo' });
   }
 };

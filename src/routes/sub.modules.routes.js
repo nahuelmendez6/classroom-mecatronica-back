@@ -5,7 +5,7 @@ import {
   createSubModule,
   updateSubModule,
   deleteSubModule
-} from '../controllers/subModuleController.js';
+} from '../controllers/sub.module.controller.js'
 
 const router = Router();
 

@@ -11,6 +11,7 @@ import companyRoutes from './routes/company.routes.js';
 import companyAddressRoutes from './routes/company.address.routes.js';
 import studentPracticeRoutes from './routes/studentPracticeAssignment.routes.js';
 import teacherRoutes from './routes/teacher.routes.js';
+import subModuleRoutes from './routes/sub.modules.routes.js';
 
 import sequelize from './config/sequalize.js';
 
@@ -67,6 +68,9 @@ app.use('/api/teachers', teacherRoutes)
 // Todas las rutas de asignacion de practicas
 app.use('/api/practice-assignments', studentPracticeRoutes);
 
+
+// Rutas de submodulos
+app.use('/api/sub-modules', subModuleRoutes);
 
 // Middleware de manejo de errores global
 // Se ejecuta cuando ocurre un error en cualquier parte de la aplicación
