@@ -30,7 +30,8 @@ const SubModule = sequelize.define('SubModule', {
     }, {
       tableName: 'sub_module',
       timestamps: false,
-      underscored: true
+      underscored: true,
+      as: 'submodules'
 });
 
 export default SubModule;

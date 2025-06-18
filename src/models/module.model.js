@@ -2,6 +2,9 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/sequalize.js';
 
+import SubModule from './sub.module.model.js';
+
+
 const Module = sequelize.define('Module', {
   id_module: {
     type: DataTypes.INTEGER,
@@ -51,6 +54,18 @@ Module.getStats = async function () {
     activeStudents: parseInt(rows.activeStudents, 10),
     assignedTeachers: parseInt(rows.assignedTeachers, 10),
   };
+
+};
+
+Module.getAll = async function () {
+  return await Module.findAll({
+    include: [
+      {
+        model: SubModule,
+        as: 'submodules'
+      }
+    ]
+  });
 };
 
 
