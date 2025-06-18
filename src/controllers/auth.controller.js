@@ -70,30 +70,60 @@ class AuthController {
      * @param {Object} req - Request object
      * @param {Object} res - Response object
      */
+    // static async logout(req, res) {
+    //     try {
+    //         const sessionId = req.user.sessionId; // Obtenido del token JWT
+    //         const success = await User.logout(sessionId);
+
+    //         if (success) {
+    //             res.status(200).json({
+    //                 success: true,
+    //                 message: 'Sesión cerrada exitosamente'
+    //             });
+    //         } else {
+    //             res.status(400).json({
+    //                 success: false,
+    //                 message: 'Error al cerrar la sesión'
+    //             });
+    //         }
+    //     } catch (error) {
+    //         res.status(500).json({
+    //             success: false,
+    //             message: 'Error al cerrar la sesión',
+    //             error: error.message
+    //         });
+    //     }
+    // }
     static async logout(req, res) {
         try {
-            const sessionId = req.user.sessionId; // Obtenido del token JWT
-            const success = await User.logout(sessionId);
-
+            console.log("Logout - req.user:", req.user);
+            const sessionId = req.user.sessionId;
+    
+            const success = await User.logout(sessionId); // acá puede estar fallando
+            console.log("Logout - éxito:", success);
+    
             if (success) {
-                res.status(200).json({
+                return res.status(200).json({
                     success: true,
                     message: 'Sesión cerrada exitosamente'
                 });
             } else {
-                res.status(400).json({
+                return res.status(400).json({
                     success: false,
                     message: 'Error al cerrar la sesión'
                 });
             }
         } catch (error) {
-            res.status(500).json({
+            console.error("Logout - error:", error);  // MOSTRÁ ESTE MENSAJE EN LA CONSOLA
+            return res.status(500).json({
                 success: false,
                 message: 'Error al cerrar la sesión',
                 error: error.message
             });
         }
     }
+    
+    
 
     /**
      * Obtiene las sesiones activas del usuario

@@ -36,4 +36,29 @@ const Session = sequelize.define('Session', {
     timestamps: false
 });
 
+
+// Modelo Session (por ejemplo, models/Session.js)
+
+Session.closeSession = async function (sessionId) {
+    try {
+        const session = await this.findByPk(sessionId);
+
+        if (!session) {
+            console.warn(`Sesión ${sessionId} no encontrada`);
+            return false;
+        }
+
+        session.status = 'inactive';
+        session.date_end = new Date();
+
+        await session.save();
+
+        return true;
+    } catch (error) {
+        console.error("Error al cerrar la sesión:", error);
+        throw error;
+    }
+};
+
+
 export default Session; 
