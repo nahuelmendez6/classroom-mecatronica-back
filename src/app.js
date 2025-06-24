@@ -59,7 +59,7 @@ app.use('/api/courses', courseRoutes);
 // Todas las rutas de empresas comenzaran con /api/empresa
 app.use('/api/companies', companyRoutes);
 
-// Todas las rutas de direcciones comenzaran con /api/address
+// Todas las rutas de direcciones comessnzaran con /api/address
 app.use('/api/address/', companyAddressRoutes);
 
 // Todas las rutas de profesores

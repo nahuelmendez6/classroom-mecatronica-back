@@ -78,8 +78,10 @@ SubModule.belongsTo(Module, {
 Module.hasMany(StudentModule, { foreignKey: 'id_module' });
 StudentModule.belongsTo(Module, { foreignKey: 'id_module' });
 
-Module.hasMany(ModuleTeacher, { foreignKey: 'id_module' });
-ModuleTeacher.belongsTo(Module, { foreignKey: 'id_module' });
+Module.hasMany(ModuleTeacher, { foreignKey: 'id_module', as: 'moduleTeachers' });
+ModuleTeacher.belongsTo(Module, { foreignKey: 'id_module', as: 'module'  });
+Teacher.hasMany(ModuleTeacher, { foreignKey: 'id_teacher', as: 'moduleTeachers' });
+ModuleTeacher.belongsTo(Teacher, { foreignKey: 'id_teacher', as: 'teacher' });
 
 Course.belongsToMany(Student, {
   through: 'student_course',

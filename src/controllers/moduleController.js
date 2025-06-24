@@ -1,6 +1,8 @@
 import Module from '../models/module.model.js';
 import { validationResult } from 'express-validator';
 
+import ModuleTeacher from '../models/module.teacher.model.js';
+
 // import multer from 'multer';
 // import upload from
 class ModuleController {
@@ -9,22 +11,91 @@ class ModuleController {
      * @param {Object} req - Request object
      * @param {Object} res - Response object
      */
+    // static async getAll(req, res) {
+    //     try {
+    //         const modules = await Module.getAll();
+    //         res.status(200).json({
+    //             success: true,
+    //             data: modules
+    //         });
+    //     } catch (error) {
+    //         console.error('Error en getAllModules:', error);
+    //         res.status(500).json({
+    //             success: false,
+    //             message: 'Error al obtener módulos',
+    //             error: error.message
+    //         });
+    //     }
+    // }
+    // static async getAll(req, res) {
+    //     try {
+    //         const modules = await Module.getAll(); // Debe incluir teachers y submodules
+
+    //         const result = modules.map(module => {
+    //             const profesores = module.teachers.map(t => ({
+    //                 id_teacher: t.id_teacher,
+    //                 nombre: t.User?.first_name + ' ' + t.User?.last_name,
+    //             }));
+
+    //             return {
+    //                 ...module.toJSON(),
+    //                 submodules: module.submodules.map(sub => ({
+    //                     ...sub.toJSON(),
+    //                     profesor: profesores[0] || null  // asignamos el primero
+    //                 }))
+    //             };
+    //         });
+
+    //         res.status(200).json({
+    //             success: true,
+    //             data: result
+    //         });
+
+    //     } catch (error) {
+    //         console.error('Error en getAllModules:', error);
+    //         res.status(500).json({
+    //             success: false,
+    //             message: 'Error al obtener módulos',
+    //             error: error.message
+    //         });
+    //     }
+    // }
+
     static async getAll(req, res) {
         try {
-            const modules = await Module.getAll();
-            res.status(200).json({
-                success: true,
-                data: modules
-            });
+          const modules = await Module.getAll();  // Traés los módulos con relaciones
+          
+          // Transformás para incluir profesores correctamente en submódulos y en el módulo
+          const result = modules.map(module => {
+            const profesores = module.moduleTeachers.map(mt => ({
+              id_teacher: mt.teacher.id_teacher,
+              nombre: mt.teacher.User.first_name + ' ' + mt.teacher.User.last_name,
+            }));
+    
+            return {
+              ...module.toJSON(),
+              submodules: module.submodules.map(sub => ({
+                ...sub.toJSON(),
+                profesor: profesores[0] || null  // asignar lógica real aquí si querés
+              })),
+              teachers: profesores
+            };
+          });
+    
+          res.status(200).json({
+            success: true,
+            data: result
+          });
         } catch (error) {
-            console.error('Error en getAllModules:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Error al obtener módulos',
-                error: error.message
-            });
+          console.error('Error en getAllModules:', error);
+          res.status(500).json({
+            success: false,
+            message: 'Error al obtener módulos',
+            error: error.message
+          });
         }
-    }
+      }
+
 
     /**
      * Crea un nuevo módulo

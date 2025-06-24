@@ -3,6 +3,10 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../config/sequalize.js';
 
 import SubModule from './sub.module.model.js';
+import Teacher from './teacher.model.js';
+import User from './user.model.js';
+import ModuleTeacher from '../models/module.teacher.model.js';
+
 
 
 const Module = sequelize.define('Module', {
@@ -63,6 +67,22 @@ Module.getAll = async function () {
       {
         model: SubModule,
         as: 'submodules'
+      },
+      {
+        model: ModuleTeacher,
+        as: 'moduleTeachers',
+        include: [
+          {
+            model: Teacher,
+            as: 'teacher',
+            include: [
+              {
+                model: User,
+                as: 'User'
+              }
+            ]
+          }
+        ]
       }
     ]
   });

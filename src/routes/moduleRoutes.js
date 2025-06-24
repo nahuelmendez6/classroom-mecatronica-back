@@ -1,13 +1,18 @@
 import express from 'express';
+import multer from 'multer';
 import { verifyToken, checkRole } from '../middleware/auth.middleware.js';
 import ModuleController from '../controllers/moduleController.js';
 import { body, param } from 'express-validator';
 
 const router = express.Router();
 
+// Configuración de multer
+const storage = multer.memoryStorage(); // o multer.diskStorage({...}) si vas a guardar archivo
+const upload = multer({ storage });
+
 // Validaciones
 const moduleValidation = [
-    body('nombre')
+    body('name')
         .notEmpty()
         .withMessage('El nombre es requerido')
         .isLength({ min: 3, max: 100 })
@@ -37,17 +42,18 @@ const moduleValidation = [
 // Todas las rutas requieren autenticación
 router.use(verifyToken);
 
-// GET /api/modules - Listar módulos
+// GET /api/modules
 router.get('/', ModuleController.getAll);
 
-// POST /api/modules - Crear módulo
+// POST /api/modules
 router.post('/',
     checkRole(['administrador']),
+    upload.single('icon_file'), // 👈 necesario para que funcione con multipart/form-data
     moduleValidation,
     ModuleController.create
 );
 
-// DELETE /api/modules/:id - Eliminar módulo
+// DELETE /api/modules/:id
 router.delete('/:id',
     checkRole(['administrador']),
     param('id').isInt().withMessage('ID de módulo inválido'),
@@ -60,10 +66,9 @@ router.post('/enroll',
     ModuleController.enrollStudent
 );
 
-// GET /api/modules/stats - Obtener estadísticas
 router.get('/stats',
     checkRole(['administrador']),
     ModuleController.getStats
 );
 
-export default router; 
+export default router;
