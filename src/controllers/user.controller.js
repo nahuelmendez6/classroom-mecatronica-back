@@ -1,422 +1,385 @@
+/**
+ * User Controller
+ * Handles user management operations including CRUD operations and user-specific functionality
+ */
+
 import User from '../models/user.model.js';
 import { validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
-import { checkRole } from '../middleware/auth.middleware.js';
 import { pool } from '../../config/database.js';
+import { asyncHandler } from '../utils/errorHandler.js';
+import { sendSuccess, sendValidationError, sendNotFound, sendError } from '../utils/responseHandler.js';
+import { ValidationError, NotFoundError, ConflictError } from '../utils/errorHandler.js';
 
 class UserController {
     /**
-     * Busca un usuario por email
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
+     * Search user by email
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
      */
-    static async searchUser(req, res) {
-        try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Error de validación',
-                    errors: errors.array()
-                });
+    static searchUser = asyncHandler(async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return sendValidationError(res, errors.array());
+        }
+
+        const { email } = req.body;
+        const user = await User.searchUser(email);
+
+        if (!user) {
+            throw new NotFoundError('User');
+        }
+
+        // Remove password from response
+        const { password, ...userWithoutPassword } = user;
+
+        sendSuccess(res, 200, 'User found', userWithoutPassword);
+    });
+
+    /**
+     * Create a new user
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
+     */
+    static createUser = asyncHandler(async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return sendValidationError(res, errors.array());
+        }
+
+        const {
+            email,
+            password,
+            confirmPassword,
+            name,
+            lastname,
+            dni,
+            phone_number,
+            id_role,
+            id_module,
+            observations,
+            id_company,
+            phone,
+            position
+        } = req.body;
+
+        // Validate password confirmation
+        if (password && password !== confirmPassword) {
+            throw new ValidationError('Passwords do not match');
+        }
+
+        // Check if email already exists
+        const existingUser = await User.searchUser(email);
+        if (existingUser) {
+            throw new ConflictError('Email is already registered');
+        }
+
+        // Validate role exists
+        const [roles] = await pool.query('SELECT * FROM role WHERE id_role = ?', [id_role]);
+        if (!roles.length) {
+            throw new ValidationError('Invalid role');
+        }
+
+        // Generate password from DNI if not provided
+        let hashedPassword;
+        if (password) {
+            hashedPassword = await bcrypt.hash(password, 10);
+        } else {
+            if (!dni) {
+                throw new ValidationError('DNI is required to generate password');
             }
+            hashedPassword = await bcrypt.hash(dni.toString(), 10);
+        }
 
-            const { email } = req.body;
-            const user = await User.searchUser(email);
+        // Create user
+        const userId = await User.createUser({
+            email,
+            password: hashedPassword,
+            id_role,
+            name,
+            lastname,
+            dni,
+            phone_number,
+            id_module,
+            observations,
+            id_company,
+            position,
+            phone
+        });
 
-            if (!user) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Usuario no encontrado'
-                });
-            }
+        sendSuccess(res, 201, 'User created successfully', { id_user: userId });
+    });
 
-            // No devolver la contraseña
+    /**
+     * Update an existing user
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
+     */
+    static updateUser = asyncHandler(async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return sendValidationError(res, errors.array());
+        }
+
+        const { id_user } = req.params;
+        const updateData = { ...req.body };
+
+        // Hash password if being updated
+        if (updateData.password) {
+            updateData.password = await bcrypt.hash(updateData.password, 10);
+        }
+
+        const success = await User.updateUser(id_user, updateData);
+
+        if (!success) {
+            throw new NotFoundError('User');
+        }
+
+        sendSuccess(res, 200, 'User updated successfully');
+    });
+
+    /**
+     * Delete a user
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
+     */
+    static deleteUser = asyncHandler(async (req, res) => {
+        const { id_user } = req.params;
+
+        const success = await User.deleteUser(id_user);
+
+        if (!success) {
+            throw new NotFoundError('User');
+        }
+
+        sendSuccess(res, 200, 'User deleted successfully');
+    });
+
+    /**
+     * Get all users with pagination and search
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
+     */
+    static getAllUsers = asyncHandler(async (req, res) => {
+        const { page = 1, limit = 10, search = '', role = '' } = req.query;
+        
+        const offset = (page - 1) * limit;
+        
+        let query = `
+            SELECT u.*, r.name as role_name 
+            FROM user u 
+            LEFT JOIN role r ON u.id_role = r.id_role 
+            WHERE 1=1
+        `;
+        const queryParams = [];
+
+        // Add search filter
+        if (search) {
+            query += ` AND (u.name LIKE ? OR u.lastname LIKE ? OR u.email LIKE ?)`;
+            const searchTerm = `%${search}%`;
+            queryParams.push(searchTerm, searchTerm, searchTerm);
+        }
+
+        // Add role filter
+        if (role) {
+            query += ` AND r.name = ?`;
+            queryParams.push(role);
+        }
+
+        // Add pagination
+        query += ` ORDER BY u.name, u.lastname LIMIT ? OFFSET ?`;
+        queryParams.push(parseInt(limit), offset);
+
+        const [users] = await pool.query(query, queryParams);
+
+        // Get total count for pagination
+        let countQuery = `
+            SELECT COUNT(*) as total 
+            FROM user u 
+            LEFT JOIN role r ON u.id_role = r.id_role 
+            WHERE 1=1
+        `;
+        const countParams = [];
+
+        if (search) {
+            countQuery += ` AND (u.name LIKE ? OR u.lastname LIKE ? OR u.email LIKE ?)`;
+            const searchTerm = `%${search}%`;
+            countParams.push(searchTerm, searchTerm, searchTerm);
+        }
+
+        if (role) {
+            countQuery += ` AND r.name = ?`;
+            countParams.push(role);
+        }
+
+        const [countResult] = await pool.query(countQuery, countParams);
+        const total = countResult[0].total;
+
+        // Remove passwords from response
+        const usersWithoutPasswords = users.map(user => {
             const { password, ...userWithoutPassword } = user;
+            return userWithoutPassword;
+        });
 
-            res.status(200).json({
-                success: true,
-                message: 'Usuario encontrado',
-                data: userWithoutPassword
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error al buscar usuario',
-                error: error.message
-            });
-        }
-    }
+        sendSuccess(res, 200, 'Users retrieved successfully', {
+            users: usersWithoutPasswords,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                totalPages: Math.ceil(total / limit)
+            }
+        });
+    });
 
     /**
-     * Crea un nuevo usuario
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
+     * Get all teachers
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
      */
-    static async createUser(req, res) {
-        try {
-            console.log('Starting createUser with data:', { ...req.body, password: '[REDACTED]' });
-            
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                console.log('Validation errors:', errors.array());
-                return res.status(400).json({
-                    success: false,
-                    message: 'Error de validación',
-                    errors: errors.array()
-                });
-            }
+    static getAllTeachers = asyncHandler(async (req, res) => {
+        const { page = 1, limit = 10, search = '' } = req.query;
+        const offset = (page - 1) * limit;
 
-            const {
-                email,
-                password,
-                confirmPassword,
-                name,
-                lastname,
-                dni,
-                phone_number,
-                id_role,
-                id_module,
-                observations,
-                id_company,
-                phone,
-                position
-            } = req.body;
+        let query = `
+            SELECT u.*, r.name as role_name 
+            FROM user u 
+            LEFT JOIN role r ON u.id_role = r.id_role 
+            WHERE r.name = 'Profesor'
+        `;
+        const queryParams = [];
 
-            console.log('Validating passwords match...');
-            // Verificar si las contraseñas coinciden
-            if (password !== confirmPassword) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Las contraseñas no coinciden'
-                });
-            }
-
-            console.log('Checking if email exists...');
-            // Verificar si el email ya existe
-            const existingUser = await User.searchUser(email);
-            if (existingUser) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'El email ya está registrado'
-                });
-            }
-
-            console.log('Validating role...');
-            // Verificar si el rol existe
-            const [roles] = await pool.query('SELECT * FROM role WHERE id_role = ?', [id_role]);
-            if (!roles.length) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Rol no válido'
-                });
-            }
-            const role = roles[0];
-            console.log('Role found:', role);
-
-            console.log('Hashing password...');
-            // Hashear la contraseña
-            //const hashedPassword = await bcrypt.hash(password, 10);
-
-            const rawPassword = dni?.toString();
-            if (!rawPassword) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'DNI es requerido para generar contraseña'
-                });
-            }
-
-            const hashedPassword = await bcrypt.hash(rawPassword, 10);
-
-            console.log('Creating user...');
-            // Crear el usuario con todos sus datos
-            const userId = await User.createUser({
-                email,
-                password: hashedPassword,
-                id_role,
-                name,
-                lastname,
-                dni,
-                phone_number,
-                id_module,
-                observations,
-                id_company,
-                position,
-                phone
-            });
-
-            console.log('User created successfully with ID:', userId);
-            res.status(201).json({
-                success: true,
-                message: 'Usuario creado exitosamente',
-                data: { id_user: userId }
-            });
-        } catch (error) {
-            console.error('Error in createUser:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Error al crear usuario',
-                error: error.message
-            });
+        if (search) {
+            query += ` AND (u.name LIKE ? OR u.lastname LIKE ? OR u.email LIKE ?)`;
+            const searchTerm = `%${search}%`;
+            queryParams.push(searchTerm, searchTerm, searchTerm);
         }
-    }
+
+        query += ` ORDER BY u.name, u.lastname LIMIT ? OFFSET ?`;
+        queryParams.push(parseInt(limit), offset);
+
+        const [teachers] = await pool.query(query, queryParams);
+
+        // Get total count
+        let countQuery = `
+            SELECT COUNT(*) as total 
+            FROM user u 
+            LEFT JOIN role r ON u.id_role = r.id_role 
+            WHERE r.name = 'Profesor'
+        `;
+        const countParams = [];
+
+        if (search) {
+            countQuery += ` AND (u.name LIKE ? OR u.lastname LIKE ? OR u.email LIKE ?)`;
+            const searchTerm = `%${search}%`;
+            countParams.push(searchTerm, searchTerm, searchTerm);
+        }
+
+        const [countResult] = await pool.query(countQuery, countParams);
+        const total = countResult[0].total;
+
+        // Remove passwords from response
+        const teachersWithoutPasswords = teachers.map(teacher => {
+            const { password, ...teacherWithoutPassword } = teacher;
+            return teacherWithoutPassword;
+        });
+
+        sendSuccess(res, 200, 'Teachers retrieved successfully', {
+            teachers: teachersWithoutPasswords,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                totalPages: Math.ceil(total / limit)
+            }
+        });
+    });
 
     /**
-     * Actualiza un usuario existente
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
+     * Get user by ID
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
      */
-    static async updateUser(req, res) {
-        try {
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Error de validación',
-                    errors: errors.array()
-                });
-            }
+    static getUserById = asyncHandler(async (req, res) => {
+        const { id_user } = req.params;
 
-            const { id_user } = req.params;
-            const updateData = { ...req.body };
+        const query = `
+            SELECT u.*, r.name as role_name 
+            FROM user u 
+            LEFT JOIN role r ON u.id_role = r.id_role 
+            WHERE u.id_user = ?
+        `;
+        
+        const [users] = await pool.query(query, [id_user]);
 
-            // Si se está actualizando la contraseña, hashearla
-            if (updateData.password) {
-                updateData.password = await bcrypt.hash(updateData.password, 10);
-            }
-
-            const success = await User.updateUser(id_user, updateData);
-
-            if (!success) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Usuario no encontrado'
-                });
-            }
-
-            res.status(200).json({
-                success: true,
-                message: 'Usuario actualizado exitosamente'
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error al actualizar usuario',
-                error: error.message
-            });
+        if (!users.length) {
+            throw new NotFoundError('User');
         }
-    }
+
+        const user = users[0];
+        const { password, ...userWithoutPassword } = user;
+
+        sendSuccess(res, 200, 'User retrieved successfully', userWithoutPassword);
+    });
 
     /**
-     * Elimina un usuario (soft delete)
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
+     * Get all roles
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
      */
-    static async deleteUser(req, res) {
-        try {
-            const { id_user } = req.params;
+    static getAllRoles = asyncHandler(async (req, res) => {
+        const [roles] = await pool.query('SELECT * FROM role ORDER BY name');
 
-            // Realizar soft delete
-            const success = await User.updateUser(id_user, {
-                is_active: false,
-                is_deleted: true,
-                deleted_at: new Date()
-            });
-
-            if (!success) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Usuario no encontrado'
-                });
-            }
-
-            // Cerrar todas las sesiones activas del usuario
-            const sessions = await User.getActiveSessions(id_user);
-            for (const session of sessions) {
-                await User.logout(session.id_session);
-            }
-
-            res.status(200).json({
-                success: true,
-                message: 'Usuario eliminado exitosamente'
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error al eliminar usuario',
-                error: error.message
-            });
-        }
-    }
+        sendSuccess(res, 200, 'Roles retrieved successfully', roles);
+    });
 
     /**
-     * Obtiene todos los usuarios
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
+     * Get all modules
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
      */
-    static async getAllUsers(req, res) {
-        try {
-            const users = await User.getAllUsers();
+    static getAllModules = asyncHandler(async (req, res) => {
+        const [modules] = await pool.query('SELECT * FROM module ORDER BY name');
 
-            // Remover contraseñas de la respuesta
-            const usersWithoutPasswords = users.map(user => {
-                const { password, ...userWithoutPassword } = user;
-                return userWithoutPassword;
-            });
-
-            res.status(200).json({
-                success: true,
-                data: usersWithoutPasswords
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error al obtener usuarios',
-                error: error.message
-            });
-        }
-    }
-
-
-        /**
-     * Obtiene a los profesores cargados en el sistema
-     */
-    static async getAllTeachers(req, res) {
-        try {
-            const teachers = await User.getTeachers();
-            // Verify that teachers is an array
-            if (!Array.isArray(teachers)) {
-                throw new Error('La respuesta de la base de datos no es un array de profesores');
-            }
-
-            const teachersWithoutPassword = teachers.map(teacher => {
-                const { password, ...teacherWithoutPassword } = teacher;
-                return teacherWithoutPassword;
-            });
-
-            res.status(200).json({
-                success: true,
-                data: teachersWithoutPassword  // Fixed variable name
-            });
-        } catch (error) {
-            console.error('Error en getAllTeachers:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Error al obtener profesores',
-                error: error.message
-            });
-        }
-    }
+        sendSuccess(res, 200, 'Modules retrieved successfully', modules);
+    });
 
     /**
-     * Obtiene un usuario por ID
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
+     * Get user statistics
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
      */
-    static async getUserById(req, res) {
-        try {
-            const { id_user } = req.params;
-            const user = await User.getUserById(id_user);
+    static getUserStats = asyncHandler(async (req, res) => {
+        // Get total users count
+        const [totalUsersResult] = await pool.query('SELECT COUNT(*) as total FROM user');
+        const totalUsers = totalUsersResult[0].total;
 
-            if (!user) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Usuario no encontrado'
-                });
-            }
+        // Get users by role
+        const [usersByRole] = await pool.query(`
+            SELECT r.name as role, COUNT(u.id_user) as count 
+            FROM role r 
+            LEFT JOIN user u ON r.id_role = u.id_role 
+            GROUP BY r.id_role, r.name 
+            ORDER BY r.name
+        `);
 
-            // Remover contraseña de la respuesta
-            const { password, ...userWithoutPassword } = user;
+        // Get recent users (last 30 days)
+        const [recentUsersResult] = await pool.query(`
+            SELECT COUNT(*) as count 
+            FROM user 
+            WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        `);
+        const recentUsers = recentUsersResult[0].count;
 
-            res.status(200).json({
-                success: true,
-                data: userWithoutPassword
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error al obtener usuario',
-                error: error.message
-            });
-        }
-    }
+        const stats = {
+            totalUsers,
+            usersByRole,
+            recentUsers,
+            lastUpdated: new Date().toISOString()
+        };
 
-    /**
-     * Obtiene todos los roles disponibles
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
-     */
-    static async getAllRoles(req, res) {
-        try {
-            const roles = await User.getAllRoles();
-            res.status(200).json({
-                success: true,
-                data: roles
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error al obtener roles',
-                error: error.message
-            });
-        }
-    }
-
-    /**
-     * Obtiene todos los módulos disponibles
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
-     */
-    static async getAllModules(req, res) {
-        try {
-            const modules = await User.getAllModules();
-            res.status(200).json({
-                success: true,
-                data: modules
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error al obtener módulos',
-                error: error.message
-            });
-        }
-    }
-
-    /**
-     * Obtiene estadísticas de usuarios
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
-     */
-    static async getUserStats(req, res) {
-        try {
-            console.log('Fetching user statistics...');
-            const stats = await User.getUserStats();
-            console.log('Statistics retrieved:', stats);
-            res.status(200).json({
-                success: true,
-                data: stats
-            });
-        } catch (error) {
-            console.error('Error detallado al obtener estadísticas:', {
-                message: error.message,
-                stack: error.stack,
-                sqlMessage: error.sqlMessage,
-                sqlState: error.sqlState,
-                sqlCode: error.code
-            });
-            res.status(500).json({
-                success: false,
-                message: 'Error al cargar estadísticas',
-                error: error.message,
-                details: process.env.NODE_ENV === 'development' ? {
-                    sqlMessage: error.sqlMessage,
-                    sqlState: error.sqlState,
-                    sqlCode: error.code
-                } : undefined
-            });
-        }
-    }
+        sendSuccess(res, 200, 'User statistics retrieved successfully', stats);
+    });
 }
 
 export default UserController;

@@ -1,231 +1,177 @@
+/**
+ * Authentication Controller
+ * Handles user authentication, session management, and authorization
+ */
+
 import User from '../models/user.model.js';
 import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
+import { sendSuccess, sendError, sendValidationError, sendUnauthorized, sendForbidden, sendNotFound } from '../utils/responseHandler.js';
+import { asyncHandler, AuthenticationError, ValidationError, AuthorizationError, NotFoundError } from '../utils/errorHandler.js';
 
 class AuthController {
     /**
-     * Inicia sesión de un usuario
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
+     * Authenticate user and create session
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
      */
-    static async login(req, res) {
-        try {
-            // Validar datos de entrada
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Error de validación',
-                    errors: errors.array()
-                });
-            }
+    static login = asyncHandler(async (req, res) => {
+        // Validate input data
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return sendValidationError(res, errors.array());
+        }
 
-            const { email, password } = req.body;
-            const sessionInfo = {
-                ip_address: req.ip,
-                user_agent: req.headers['user-agent']
-            };
+        const { email, password } = req.body;
+        const sessionInfo = {
+            ip_address: req.ip,
+            user_agent: req.headers['user-agent']
+        };
 
-            // Autenticar usuario y crear sesión
-            const { user, sessionId } = await User.authenticateAndCreateSession(
-                email,
-                password,
-                sessionInfo
-            );
+        // Authenticate user and create session
+        const { user, sessionId } = await User.authenticateAndCreateSession(
+            email,
+            password,
+            sessionInfo
+        );
 
-            // Generar token JWT
-            const token = jwt.sign(
-                { 
-                    id_user: user.id_user,
-                    email: user.email,
-                    role: {
-                        id_role: user.role.id_role,
-                        name: user.role.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-                    },
-                    sessionId 
+        // Generate JWT token
+        const token = jwt.sign(
+            { 
+                id_user: user.id_user,
+                email: user.email,
+                role: {
+                    id_role: user.role.id_role,
+                    name: user.role.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
                 },
-                process.env.JWT_SECRET,
-                { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
-            );
+                sessionId 
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+        );
 
-            res.status(200).json({
-                success: true,
-                message: 'Login exitoso',
-                data: {
-                    user,
-                    token,
-                    sessionId
-                }
-            });
-        } catch (error) {
-            res.status(401).json({
-                success: false,
-                message: error.message
-            });
-        }
-    }
+        sendSuccess(res, 200, 'Login successful', {
+            user,
+            token,
+            sessionId
+        });
+    });
 
     /**
-     * Cierra la sesión de un usuario
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
+     * Logout user and invalidate session
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
      */
-    // static async logout(req, res) {
-    //     try {
-    //         const sessionId = req.user.sessionId; // Obtenido del token JWT
-    //         const success = await User.logout(sessionId);
-
-    //         if (success) {
-    //             res.status(200).json({
-    //                 success: true,
-    //                 message: 'Sesión cerrada exitosamente'
-    //             });
-    //         } else {
-    //             res.status(400).json({
-    //                 success: false,
-    //                 message: 'Error al cerrar la sesión'
-    //             });
-    //         }
-    //     } catch (error) {
-    //         res.status(500).json({
-    //             success: false,
-    //             message: 'Error al cerrar la sesión',
-    //             error: error.message
-    //         });
-    //     }
-    // }
-    static async logout(req, res) {
-        try {
-            console.log("Logout - req.user:", req.user);
-            const sessionId = req.user.sessionId;
-    
-            const success = await User.logout(sessionId); // acá puede estar fallando
-            console.log("Logout - éxito:", success);
-    
-            if (success) {
-                return res.status(200).json({
-                    success: true,
-                    message: 'Sesión cerrada exitosamente'
-                });
-            } else {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Error al cerrar la sesión'
-                });
-            }
-        } catch (error) {
-            console.error("Logout - error:", error);  // MOSTRÁ ESTE MENSAJE EN LA CONSOLA
-            return res.status(500).json({
-                success: false,
-                message: 'Error al cerrar la sesión',
-                error: error.message
-            });
+    static logout = asyncHandler(async (req, res) => {
+        const sessionId = req.user.sessionId;
+        
+        if (!sessionId) {
+            throw new AuthenticationError('No active session found');
         }
-    }
-    
-    
+
+        const success = await User.logout(sessionId);
+        
+        if (!success) {
+            throw new AuthenticationError('Failed to logout session');
+        }
+
+        sendSuccess(res, 200, 'Logout successful');
+    });
 
     /**
-     * Obtiene las sesiones activas del usuario
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
+     * Get user's active sessions
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
      */
-    static async getActiveSessions(req, res) {
-        try {
-            const userId = req.user.id_user; // Obtenido del token JWT
-            const sessions = await User.getActiveSessions(userId);
+    static getActiveSessions = asyncHandler(async (req, res) => {
+        const userId = req.user.id_user;
+        const sessions = await User.getActiveSessions(userId);
 
-            res.status(200).json({
-                success: true,
-                data: sessions
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error al obtener las sesiones activas',
-                error: error.message
-            });
-        }
-    }
+        sendSuccess(res, 200, 'Active sessions retrieved', sessions);
+    });
 
     /**
-     * Cierra todas las sesiones activas del usuario
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
+     * Close all active sessions for the current user
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
      */
-    static async closeAllSessions(req, res) {
-        try {
-            const userId = req.user.id_user; // Obtenido del token JWT
-            const sessions = await User.getActiveSessions(userId);
-            
-            // Cerrar todas las sesiones sin excepción
-            for (const session of sessions) {
-                await User.logout(session.id_session);
-            }
+    static closeAllSessions = asyncHandler(async (req, res) => {
+        const userId = req.user.id_user;
+        const sessions = await User.getActiveSessions(userId);
+        
+        // Close all sessions
+        const logoutPromises = sessions.map(session => 
+            User.logout(session.id_session)
+        );
+        
+        await Promise.all(logoutPromises);
 
-            res.status(200).json({
-                success: true,
-                message: 'Todas las sesiones han sido cerradas exitosamente'
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error al cerrar las sesiones',
-                error: error.message
-            });
-        }
-    }
+        sendSuccess(res, 200, 'All sessions closed successfully');
+    });
 
     /**
-     * Cierra todas las sesiones de un usuario por email (solo administradores)
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
+     * Close all sessions for a user by email (admin only)
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
      */
-    static async closeAllSessionsByEmail(req, res) {
-        try {
-            // Verificar que el usuario que hace la petición es administrador
-            if (req.user.role.name !== 'Administrador') {
-                return res.status(403).json({
-                    success: false,
-                    message: 'Solo los administradores pueden cerrar sesiones de otros usuarios'
-                });
-            }
-
-            const { email } = req.body;
-            if (!email) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'El email es requerido'
-                });
-            }
-
-            // Buscar el usuario
-            const user = await User.searchUser(email);
-            if (!user) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Usuario no encontrado'
-                });
-            }
-
-            // Obtener y cerrar todas las sesiones
-            const sessions = await User.getActiveSessions(user.id_user);
-            for (const session of sessions) {
-                await User.logout(session.id_session);
-            }
-
-            res.status(200).json({
-                success: true,
-                message: 'Todas las sesiones del usuario han sido cerradas exitosamente'
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error al cerrar las sesiones',
-                error: error.message
-            });
+    static closeAllSessionsByEmail = asyncHandler(async (req, res) => {
+        // Verify admin role
+        if (req.user.role.name.toLowerCase() !== 'administrador') {
+            throw new AuthorizationError('Only administrators can close sessions for other users');
         }
-    }
+
+        const { email } = req.body;
+        
+        if (!email) {
+            throw new ValidationError('Email is required');
+        }
+
+        // Find user
+        const user = await User.searchUser(email);
+        if (!user) {
+            throw new NotFoundError('User');
+        }
+
+        // Get and close all sessions
+        const sessions = await User.getActiveSessions(user.id_user);
+        const logoutPromises = sessions.map(session => 
+            User.logout(session.id_session)
+        );
+        
+        await Promise.all(logoutPromises);
+
+        sendSuccess(res, 200, 'All user sessions closed successfully');
+    });
+
+    /**
+     * Refresh user session
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
+     */
+    static refreshSession = asyncHandler(async (req, res) => {
+        const userId = req.user.id_user;
+        const sessionId = req.user.sessionId;
+
+        // Verify session is still valid
+        const session = await User.getSessionById(sessionId);
+        if (!session || session.id_user !== userId) {
+            throw new AuthenticationError('Invalid session');
+        }
+
+        // Generate new token
+        const token = jwt.sign(
+            { 
+                id_user: req.user.id_user,
+                email: req.user.email,
+                role: req.user.role,
+                sessionId 
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+        );
+
+        sendSuccess(res, 200, 'Session refreshed', { token });
+    });
 }
 
 export default AuthController; 

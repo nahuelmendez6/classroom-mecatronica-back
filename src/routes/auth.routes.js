@@ -1,3 +1,8 @@
+/**
+ * Authentication Routes
+ * Handles user login, logout, and session management
+ */
+
 import { Router } from 'express';
 import { body } from 'express-validator';
 import AuthController from '../controllers/auth.controller.js';
@@ -5,33 +10,67 @@ import { verifyToken, checkRole } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
-// Validaciones para el login
+/**
+ * Validation middleware for login
+ */
 const loginValidation = [
     body('email')
+        .trim()
         .isEmail()
-        .withMessage('El email debe ser válido')
+        .withMessage('Please provide a valid email address')
         .normalizeEmail(),
     body('password')
+        .trim()
+        .isLength({ min: 6 })
+        .withMessage('Password must be at least 6 characters long')
         .notEmpty()
-        .withMessage('La contraseña es requerida')
+        .withMessage('Password is required')
 ];
 
-// Rutas públicas
+/**
+ * Validation middleware for admin operations
+ */
+const adminEmailValidation = [
+    body('email')
+        .trim()
+        .isEmail()
+        .withMessage('Please provide a valid email address')
+        .normalizeEmail()
+];
+
+// Public routes (no authentication required)
 router.post('/login', loginValidation, AuthController.login);
 
-// Rutas protegidas
+// Protected routes (authentication required)
 router.post('/logout', verifyToken, AuthController.logout);
 router.get('/sessions', verifyToken, AuthController.getActiveSessions);
 router.post('/close-all-sessions', verifyToken, AuthController.closeAllSessions);
-router.post('/admin/close-sessions-by-email', verifyToken, AuthController.closeAllSessionsByEmail);
 
+// Admin-only routes
+router.post(
+    '/admin/close-sessions-by-email', 
+    verifyToken, 
+    checkRole(['administrador']),
+    adminEmailValidation,
+    AuthController.closeAllSessionsByEmail
+);
 
-router.get('/test', verifyToken, checkRole(['administrador']), (req, res) => {
-    res.json({
-      success: true,
-      message: 'Autenticación y rol verificados correctamente',
-      user: req.user
-    });
-  });
+// Test route for authentication verification
+router.get(
+    '/test', 
+    verifyToken, 
+    checkRole(['administrador']), 
+    (req, res) => {
+        res.json({
+            success: true,
+            message: 'Authentication and role verification successful',
+            user: {
+                id: req.user.id_user,
+                email: req.user.email,
+                role: req.user.role
+            }
+        });
+    }
+);
 
 export default router; 

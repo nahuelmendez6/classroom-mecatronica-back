@@ -1,78 +1,108 @@
+/**
+ * User Routes
+ * Handles all user-related API endpoints with proper validation and authorization
+ */
+
 import { Router } from 'express';
 import { body, param } from 'express-validator';
 import UserController from '../controllers/user.controller.js';
 import { verifyToken, checkRole } from '../middleware/auth.middleware.js';
+import { userValidation, idValidation, paginationValidation } from '../utils/validation.js';
 
 const router = Router();
 
-// Validaciones comunes
-const emailValidation = body('email')
-    .isEmail()
-    .withMessage('El email debe ser válido')
-    .normalizeEmail();
+/**
+ * Custom validation for password confirmation
+ */
+const confirmPasswordValidation = body('confirmPassword')
+    .custom((value, { req }) => {
+        if (value !== req.body.password) {
+            throw new Error('Passwords do not match');
+        }
+        return true;
+    });
 
-const passwordValidation = body('password')
-    .notEmpty()
-    .withMessage('La contraseña es requerida');
-
-const nameValidation = body(['name', 'lastname'])
-    .isLength({ min: 2, max: 100 })
-    .withMessage('El nombre y apellido deben tener entre 2 y 100 caracteres')
-    .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)
-    .withMessage('El nombre y apellido solo pueden contener letras y espacios');
-
+/**
+ * Validation for DNI
+ */
 const dniValidation = body('dni')
     .optional()
     .isLength({ min: 7, max: 20 })
-    .withMessage('El DNI debe tener entre 7 y 20 caracteres')
+    .withMessage('DNI must be between 7 and 20 characters')
     .matches(/^[0-9]+$/)
-    .withMessage('El DNI solo puede contener números');
+    .withMessage('DNI can only contain numbers');
 
+/**
+ * Validation for phone number
+ */
 const phoneValidation = body('phone_number')
     .optional()
     .matches(/^[0-9+\-\s()]+$/)
-    .withMessage('El número de teléfono no es válido');
+    .withMessage('Invalid phone number format');
 
-const roleValidation = body('id_role')
-    .isInt()
-    .withMessage('El ID del rol debe ser un número entero válido');
-
+/**
+ * Validation for module ID
+ */
 const moduleValidation = body('id_module')
     .optional()
-    .isInt()
-    .withMessage('El módulo debe ser un número entero válido');
+    .isInt({ min: 1 })
+    .withMessage('Module ID must be a valid positive integer');
 
-// Rutas públicas
+/**
+ * Validation for company ID
+ */
+const companyValidation = body('id_company')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Company ID must be a valid positive integer');
+
+/**
+ * Validation for position
+ */
+const positionValidation = body('position')
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage('Position must not exceed 100 characters');
+
+/**
+ * Validation for observations
+ */
+const observationsValidation = body('observations')
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('Observations must not exceed 500 characters');
+
+// Public routes (no authentication required)
 router.post('/search', 
-    emailValidation,
+    userValidation.email,
     UserController.searchUser
 );
 
-// Rutas protegidas
-router.use(verifyToken); // Todas las rutas siguientes requieren autenticación
+// Protected routes (authentication required)
+router.use(verifyToken);
 
-// Rutas que requieren rol de administrador
+// Admin-only routes
 router.post('/',
     [
-        emailValidation,
-        passwordValidation,
-        nameValidation,
+        userValidation.email,
+        userValidation.password,
+        userValidation.firstName,
+        userValidation.lastName,
         dniValidation,
         phoneValidation,
-        roleValidation,
+        userValidation.roleId,
         moduleValidation,
-        body('confirmPassword').custom((value, { req }) => {
-            if (value !== req.body.password) {
-                throw new Error('Las contraseñas no coinciden');
-            }
-            return true;
-        })
+        companyValidation,
+        positionValidation,
+        observationsValidation,
+        confirmPasswordValidation
     ],
     checkRole(['administrador']),
     UserController.createUser
 );
 
-// Rutas para obtener roles y módulos
 router.get('/roles',
     checkRole(['administrador']),
     UserController.getAllRoles
@@ -83,49 +113,61 @@ router.get('/modules',
     UserController.getAllModules
 );
 
-router.get('/teachers',
-    checkRole(['administrador']),
-    UserController.getAllTeachers
-)
-
-// Ruta para obtener estadísticas de usuarios
 router.get('/stats',
     checkRole(['administrador']),
     UserController.getUserStats
 );
 
-// Rutas que requieren rol de administrador o profesor
-router.get('/',
-    checkRole(['administrador', 'Profesor']),
-    UserController.getAllUsers
-);
-
-
-router.get('/:id_user',
-    param('id_user').isInt().withMessage('ID de usuario inválido'),
-    checkRole(['administrador', 'Profesor']),
-    UserController.getUserById
-);
-
-router.put('/:id_user',
+router.put('/:id',
     [
-        param('id_user').isInt().withMessage('ID de usuario inválido'),
-        emailValidation.optional(),
-        passwordValidation.optional(),
-        nameValidation.optional(),
+        idValidation.userId,
+        userValidation.email.optional(),
+        userValidation.password.optional(),
+        userValidation.firstName.optional(),
+        userValidation.lastName.optional(),
         dniValidation.optional(),
         phoneValidation.optional(),
-        roleValidation.optional(),
-        moduleValidation.optional()
+        userValidation.roleId.optional(),
+        moduleValidation.optional(),
+        companyValidation.optional(),
+        positionValidation.optional(),
+        observationsValidation.optional()
     ],
     checkRole(['administrador']),
     UserController.updateUser
 );
 
-router.delete('/:id_user',
-    param('id_user').isInt().withMessage('ID de usuario inválido'),
+router.delete('/:id',
+    idValidation.userId,
     checkRole(['administrador']),
     UserController.deleteUser
+);
+
+// Routes for administrators and teachers
+router.get('/',
+    [
+        paginationValidation.page,
+        paginationValidation.limit,
+        paginationValidation.search
+    ],
+    checkRole(['administrador', 'profesor']),
+    UserController.getAllUsers
+);
+
+router.get('/:id',
+    idValidation.userId,
+    checkRole(['administrador', 'profesor']),
+    UserController.getUserById
+);
+
+router.get('/teachers',
+    [
+        paginationValidation.page,
+        paginationValidation.limit,
+        paginationValidation.search
+    ],
+    checkRole(['administrador']),
+    UserController.getAllTeachers
 );
 
 export default router; 
