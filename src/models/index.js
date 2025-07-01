@@ -17,6 +17,7 @@ import LearningMaterial from './learning.material.js';
 import ModuleTeacher from './module.teacher.model.js';
 import LoginAttempt from './login.attempt.model.js';
 import SubModule from './sub.module.model.js';
+import StudentCourse from './student.course.js';
 
 // RELACIONES (sólo después de importar todo)
 
@@ -61,7 +62,7 @@ Module.hasMany(StudentPracticeAssignment, { foreignKey: 'id_module' });
 Session.belongsTo(User, { foreignKey: 'id_user' });
 LoginAttempt.belongsTo(User, { foreignKey: 'id_user' });
 
-Course.hasMany(Module, { foreignKey: 'id_course' });
+Course.hasMany(Module, { foreignKey: 'id_course', as: 'modulos' });
 Module.belongsTo(Course, { foreignKey: 'id_course' });
 Module.hasMany(SubModule, {
   foreignKey: 'id_module',
@@ -103,6 +104,19 @@ LearningMaterial.belongsTo(Module, {
 
 Student.hasMany(StudentPracticeAssignment, { foreignKey: 'id_student', onDelete: 'CASCADE' });
 Company.hasMany(StudentPracticeAssignment, { foreignKey: 'id_company', onDelete: 'CASCADE' });
+
+
+Student.belongsToMany(Course, {
+  through: StudentCourse,
+  foreignKey: 'id_student',
+  otherKey: 'id_course'
+});
+
+Course.belongsToMany(Student, {
+  through: StudentCourse,
+  foreignKey: 'id_course',
+  otherKey: 'id_student'
+});
 
 export {
   sequelize,

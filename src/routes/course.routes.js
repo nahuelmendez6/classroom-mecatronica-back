@@ -5,7 +5,8 @@ import {
   createCourse, 
   updateCourse, 
   deleteCourse,
-  enrollStudent
+  enrollStudent,
+  getStudentsByCourse
 } from '../controllers/course.controller.js';
 import { verifyToken } from '../middleware/auth.middleware.js';
 
@@ -32,6 +33,8 @@ router.put('/:id', updateCourse);
 
 // DELETE /api/courses/:id - Eliminar un curso
 router.delete('/:id', deleteCourse);
+
+router.get('/:courseId/students', getStudentsByCourse);
 
 
 export default router; 

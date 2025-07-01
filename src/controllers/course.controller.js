@@ -1,8 +1,18 @@
 import Course from '../models/Course.js';
+import Module from '../models/module.model.js';
+import StudentCourse from '../models/student.course.js';
+import Student from '../models/student.model.js';
 
 export const getAllCourses = async (req, res) => {
   try {
-    const courses = await Course.findAll();
+    const courses = await Course.findAll({
+      include: [
+        {
+          model: Module,
+          as: 'modulos'
+        }
+      ]
+    });
     res.json({
       success: true,
       data: courses
@@ -188,3 +198,39 @@ export const enrollStudent = async (req, res) => {
     });
   }
 }
+
+export const getStudentsByCourse = async (req, res) => {
+  const { courseId } = req.params;
+
+  try {
+    const course = await Course.findByPk(courseId, {
+      include: {
+        model: Student,
+        through: {
+          model: StudentCourse,
+          attributes: ['enrollment_date', 'status'] // Campos de la tabla intermedia
+        }
+      }
+    });
+
+    if (!course) {
+      return res.status(404).json({ message: 'Curso no encontrado' });
+    }
+
+    const studentsWithEnrollment = course.Students.map(student => {
+      return {
+        id_student: student.id_student,
+        name: student.name,
+        lastname: student.lastname,
+        dni: student.dni,
+        enrollment_date: student.StudentCourse.enrollment_date,
+        status: student.StudentCourse.status
+      };
+    });
+
+    res.json(studentsWithEnrollment);
+  } catch (error) {
+    console.error('Error al obtener estudiantes del curso:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};

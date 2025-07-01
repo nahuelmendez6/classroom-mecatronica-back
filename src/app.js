@@ -12,6 +12,8 @@ import companyAddressRoutes from './routes/company.address.routes.js';
 import studentPracticeRoutes from './routes/studentPracticeAssignment.routes.js';
 import teacherRoutes from './routes/teacher.routes.js';
 import subModuleRoutes from './routes/sub.modules.routes.js';
+import studentCourseRoute from './routes/student.course.js';
+import studentRoutes from './routes/student.routes.js';
 
 import sequelize from './config/sequalize.js';
 
@@ -50,10 +52,14 @@ app.use('/api/auth', authRoutes);
 // Todas las rutas de usuarios comenzarán con /api/users
 app.use('/api/users', userRoutes);
 
+app.use('/api/student-course', studentCourseRoute);
+
 // Todas las rutas de módulos comenzarán con /api/modules
 app.use('/api/modules', moduleRoutes);
 
 // Todas las rutas de cursos comenzarán con /api/courses
+app.use('/api/courses', courseRoutes);
+
 app.use('/api/courses', courseRoutes);
 
 // Todas las rutas de empresas comenzaran con /api/empresa
@@ -68,9 +74,21 @@ app.use('/api/teachers', teacherRoutes)
 // Todas las rutas de asignacion de practicas
 app.use('/api/practice-assignments', studentPracticeRoutes);
 
+// Rutas de asignacion estudiante-curso
+app.use('/api/student-course', studentCourseRoute);
+
+// Montar la ruta bajo /api/students
+app.use('/api/students', studentRoutes);
 
 // Rutas de submodulos
 app.use('/api/sub-modules', subModuleRoutes);
+
+
+
+// Añade esta línea para registrar las nuevas rutas de estudiantes
+app.use('/api/students', studentRoutes);
+
+// ... resto de la configuración
 
 // Middleware de manejo de errores global
 // Se ejecuta cuando ocurre un error en cualquier parte de la aplicación
