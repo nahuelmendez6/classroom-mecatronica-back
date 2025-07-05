@@ -1,3 +1,96 @@
+import e, { Router } from 'express';
+import UserController from '../controllers/user.controller.js';
+import { verifyToken, checkRole } from '../middleware/auth.middleware.js';
+import { userValidation, idValidation } from '../utils/validation.js';
+import { body } from 'express-validator';
+
+const router = Router();
+
+// Validaciones para crear usuarios
+const createUserValidations = [
+    userValidation.email,
+    userValidation.password,
+    userValidation.confirmPassword,
+    userValidation.firstName,
+    userValidation.lastName,
+    userValidation.dni.optional(),
+    userValidation.phone.optional(),
+    userValidation.roleId,
+    userValidation.moduleId.optional()
+];
+
+// Validaciones para actualizar usuarios
+const updateUserValidations = [
+    idValidation.userId,
+    userValidation.email.optional(),
+    userValidation.password.optional(),
+    userValidation.confirmPassword.optional(),
+    userValidation.firstName.optional(),
+    userValidation.lastName.optional(),
+    userValidation.dni.optional(),
+    userValidation.phone.optional(),
+    userValidation.roleId.optional(),
+    userValidation.moduleId.optional()
+];
+
+// Rutas públicas
+router.post('/search',
+    userValidation.email,
+    UserController.searchUser
+);  
+
+// Rutas protegidas
+router.use(verifyToken); // Todas las rutas siguientes requieren autenticación
+
+// Admin Only Routes
+router.post('/',
+    createUserValidations,
+    checkRole(['administrador']),
+    UserController.createUser
+);  
+router.get('/roles',
+    checkRole(['administrador']),
+    UserController.getAllRoles
+);
+router.get('/modules',
+    checkRole(['administrador']),
+    UserController.getAllModules
+);
+router.get('/teachers',
+    checkRole(['administrador']),
+    UserController.getAllTeachers
+);
+router.get('/stats',
+    checkRole(['administrador']),
+    UserController.getUserStats
+); 
+router.put('/:id_user',
+    updateUserValidations,
+    checkRole(['administrador']),
+    UserController.updateUser
+);
+router.delete('/:id_user',
+    idValidation.userId,
+    checkRole(['administrador']),
+    UserController.deleteUser
+);
+
+// Admin or Teacher Routes
+router.get('/',
+    checkRole(['administrador', 'Profesor']),
+    UserController.getAllUsers
+);
+router.get('/:id_user',
+    idValidation.userId,
+    checkRole(['administrador', 'Profesor']),
+    UserController.getUserById
+);
+
+export default router;
+
+
+
+/**
 import { Router } from 'express';
 import { body, param } from 'express-validator';
 import UserController from '../controllers/user.controller.js';
@@ -128,4 +221,4 @@ router.delete('/:id_user',
     UserController.deleteUser
 );
 
-export default router; 
+export default router;  */
