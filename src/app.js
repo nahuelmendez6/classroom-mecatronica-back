@@ -24,6 +24,13 @@ import './models/index.js';
 // Configuración de variables de entorno
 dotenv.config();
 
+console.log('🔐 Variables de entorno cargadas:');
+console.log('DB_USER:', process.env.DB_USER);
+console.log('DB_PASSWORD:', process.env.DB_PASSWORD ? '****' : 'NO DEFINIDA');
+console.log('DB_NAME:', process.env.DB_NAME);
+console.log('DB_HOST:', process.env.DB_HOST);
+
+
 // Inicialización de la aplicación Express
 const app = express();
 
@@ -42,51 +49,32 @@ app.use(express.json());
 // URL-encoded: Permite procesar datos de formularios
 app.use(express.urlencoded({ extended: true }));
 
+
+// ====================
 // Configuración de rutas
-// Todas las rutas de administradores comenzarán con /api/admins
-app.use('/api/admins', adminRoutes);
+// ====================
 
-// Todas las rutas de autenticacion comenzarán con /api/auth'
-app.use('/api/auth', authRoutes);
+// 1. Rutas de autenticación y administración
+app.use('/api/admins', adminRoutes); // Administradores
+app.use('/api/auth', authRoutes);    // Autenticación
+app.use('/api/users', userRoutes);   // Usuarios
 
-// Todas las rutas de usuarios comenzarán con /api/users
-app.use('/api/users', userRoutes);
+// 2. Rutas de entidades principales
+app.use('/api/students', studentRoutes); // Estudiantes
+app.use('/api/teachers', teacherRoutes); // Profesores
+app.use('/api/companies', companyRoutes); // Empresas
 
-app.use('/api/student-course', studentCourseRoute);
+// 3. Rutas de módulos y submódulos
+app.use('/api/modules', moduleRoutes);      // Módulos
+app.use('/api/sub-modules', subModuleRoutes); // Submódulos
 
-// Todas las rutas de módulos comenzarán con /api/modules
-app.use('/api/modules', moduleRoutes);
+// 4. Rutas de cursos y asignaciones
+app.use('/api/courses', courseRoutes); // Cursos
+app.use('/api/student-course', studentCourseRoute); // Asignación estudiante-curso
+app.use('/api/practice-assignments', studentPracticeRoutes); // Asignación de prácticas
 
-// Todas las rutas de cursos comenzarán con /api/courses
-app.use('/api/courses', courseRoutes);
-
-app.use('/api/courses', courseRoutes);
-
-// Todas las rutas de empresas comenzaran con /api/empresa
-app.use('/api/companies', companyRoutes);
-
-// Todas las rutas de direcciones comessnzaran con /api/address
-app.use('/api/address/', companyAddressRoutes);
-
-// Todas las rutas de profesores
-app.use('/api/teachers', teacherRoutes)
-
-// Todas las rutas de asignacion de practicas
-app.use('/api/practice-assignments', studentPracticeRoutes);
-
-// Rutas de asignacion estudiante-curso
-app.use('/api/student-course', studentCourseRoute);
-
-// Montar la ruta bajo /api/students
-app.use('/api/students', studentRoutes);
-
-// Rutas de submodulos
-app.use('/api/sub-modules', subModuleRoutes);
-
-
-
-// Añade esta línea para registrar las nuevas rutas de estudiantes
-app.use('/api/students', studentRoutes);
+// 5. Rutas de empresas: direcciones y contactos
+app.use('/api/address', companyAddressRoutes); // Direcciones de empresa
 
 // ... resto de la configuración
 
@@ -98,6 +86,7 @@ app.use((err, req, res, next) => {
         success: false,
         message: 'Something went wrong!',
         // En desarrollo mostramos el error, en producción no
+        
         error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
 });
