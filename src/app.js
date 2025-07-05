@@ -24,7 +24,7 @@ import './models/index.js';
 // Configuración de variables de entorno
 dotenv.config();
 
-console.log('🔐 Variables de entorno cargadas:');
+console.log('Variables de entorno cargadas:');
 console.log('DB_USER:', process.env.DB_USER);
 console.log('DB_PASSWORD:', process.env.DB_PASSWORD ? '****' : 'NO DEFINIDA');
 console.log('DB_NAME:', process.env.DB_NAME);
