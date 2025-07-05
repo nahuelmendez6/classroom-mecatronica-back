@@ -18,6 +18,9 @@ import studentRoutes from './routes/student.routes.js';
 import sequelize from './config/sequalize.js';
 
 import './models/index.js';
+import { ValidationError } from 'sequelize';
+import { AppError, NotFoundError, ConflictError } from './utils/errorHandler.js';
+import { sendError, sendValidationError, sendNotFound } from './utils/responseHandler.js';
 
 
 
@@ -78,17 +81,28 @@ app.use('/api/address', companyAddressRoutes); // Direcciones de empresa
 
 // ... resto de la configuración
 
-// Middleware de manejo de errores global
-// Se ejecuta cuando ocurre un error en cualquier parte de la aplicación
+
+// Middleware de manejo de errores global mejorado
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-        success: false,
-        message: 'Something went wrong!',
-        // En desarrollo mostramos el error, en producción no
-        
-        error: process.env.NODE_ENV === 'development' ? err.message : undefined
-    });
+    // Validaciones
+    if (err instanceof ValidationError) {
+        // Si el error tiene un array de errores, lo usamos, si no, solo el mensaje
+        return sendValidationError(res, err.errors || [{ message: err.message }]);
+    }
+    // No encontrado
+    if (err instanceof NotFoundError) {
+        return sendNotFound(res, err.message);
+    }
+    // Conflicto
+    if (err instanceof ConflictError) {
+        return sendError(res, 409, err.message);
+    }
+    // Errores personalizados
+    if (err instanceof AppError) {
+        return sendError(res, err.statusCode || 500, err.message);
+    }
+    // Otros errores
+    return sendError(res, 500, 'Error interno del servidor', process.env.NODE_ENV === 'development' ? err.stack : undefined);
 });
 
 
