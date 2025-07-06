@@ -31,7 +31,7 @@ router.post("/enroll", enrollStudent);
 // PUT /api/courses/:id - Actualizar un curso
 router.put('/:id', updateCourse);
 
-// DELETE /api/courses/:id - Eliminar un curso
+// DELETE /api/courses/:id - Eliminar un cursoapl
 router.delete('/:id', deleteCourse);
 
 router.get('/:courseId/students', getStudentsByCourse);

@@ -75,3 +75,21 @@ export const studentValidation = {
         .optional()
         .isString().withMessage('Las observaciones deben ser un texto')
 };
+
+export const courseValidation = {
+    course: body('course')
+        .isLength({ min: 2, max: 100 }).withMessage('El nombre del curso debe tener entre 2 y 100 caracteres'),
+
+    start_date: body('start_date')
+        .isISO8601().withMessage('La fecha de inicio debe ser una fecha válida'),
+
+    end_date: body('end_date')
+        .isISO8601().withMessage('La fecha de fin debe ser una fecha válida'),
+
+    status: body('status')
+        .isIn(['Activo', 'Inactivo', 'Completado']).withMessage('El estado del curso no es válido'),
+
+    description: body('description')
+        .optional()
+        .isString().withMessage('La descripción debe ser un texto')
+};
