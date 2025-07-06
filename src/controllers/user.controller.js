@@ -17,161 +17,77 @@ import {
     sendNotFound,
 } from '../utils/responseHandler.js';
 
+import UserService from '../services/user.service.js';
+
+
 class UserController {
 
     static searchUser = asyncHandler(async (req, res) => {
         const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            throw new ValidationError('Error de validación', errors.array());
-        }
+        if (!errors.isEmpty()) throw new ValidationError('Error de validación', errors.array());
 
         const { email } = req.body;
-        const user = await User.searchUser(email);
-        if (!user) {
-            throw new NotFoundError('Usuario');
-        }
-
-        const { password, ...userWithoutPassword } = user;
-        sendSuccess(res, 200, 'Usuario encontrado', userWithoutPassword);
+        const user = await UserService.searchUserByEmail(email);
+        sendSuccess(res, 200, 'Usuario encontrado', user);
     });
 
     static createUser = asyncHandler(async (req, res) => {
+        console.log('REQ BODY:', req.body);
         const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            throw new ValidationError('Error de validación', errors.array());
-        }
+        if (!errors.isEmpty()) throw new ValidationError('Error de validación', errors.array());
 
-        const {
-            email,
-            password,
-            confirmPassword,
-            name,
-            lastname,
-            dni,
-            phone_number,
-            id_role,
-            id_module,
-            observations,
-            id_company,
-            phone,
-            position
-        } = req.body;
-
-        if (password !== confirmPassword) {
+        const { password, ConflictError } = req.body;
+        if (password !== req.body.confirmPassword) {
             throw new ValidationError('Las contraseñas no coinciden');
         }
 
-        const existingUser = await User.searchUser(email);
-        if (existingUser) {
-            throw new ConflictError('El email ya está registrado');
-        }
+        const user = await UserService.createUser(req.body);
 
-        const [roles] = await pool.query('SELECT * FROM role WHERE id_role = ?', [id_role]);
-        if (!roles.length) {
-            throw new ValidationError('Rol no válido');
-        }
-
-        const rawPassword = dni?.toString();
-        if (!rawPassword) {
-            throw new ValidationError('DNI es requerido para generar contraseña');
-        }
-
-        const hashedPassword = await bcrypt.hash(rawPassword, 10);
-        const userId = await User.createUser({
-            email,
-            password: hashedPassword,
-            id_role,
-            name,
-            lastname,
-            dni,
-            phone_number,
-            id_module,
-            observations,
-            id_company,
-            position,
-            phone
-        });
-
-        sendSuccess(res, 201, 'Usuario creado exitosamente', { id_user: userId });
+        sendSuccess(res, 201, 'Usuario creado exitosamente', { id_user: user });
     });
+
 
     static updateUser = asyncHandler(async (req, res) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            throw new ValidationError('Error de validación', errors.array());
-        }
+         const errors = validationResult(req);
+        if (!errors.isEmpty()) throw new ValidationError('Error de validación', errors.array());
 
-        const { id_user } = req.params;
-        const updateData = { ...req.body };
-
-        if (updateData.password) {
-            updateData.password = await bcrypt.hash(updateData.password, 10);
-        }
-
-        const success = await User.updateUser(id_user, updateData);
-        if (!success) {
-            throw new NotFoundError('Usuario');
-        }
-
+        await UserService.updateUser(req.params.id_user, req.body);
         sendSuccess(res, 200, 'Usuario actualizado exitosamente');
+
     });
 
-    static deleteUser = asyncHandler(async (req, res) => {
-        const { id_user } = req.params;
-
-        const success = await User.updateUser(id_user, {
-            is_active: false,
-            is_deleted: true,
-            deleted_at: new Date()
-        });
-
-        if (!success) throw new NotFoundError('Usuario');
-
-        const sessions = await User.getActiveSessions(id_user);
-        for (const session of sessions) {
-            await User.logout(session.id_session);
-        }
-
+   static deleteUser = asyncHandler(async (req, res) => {
+        await UserService.deleteUser(req.params.id_user);
         sendSuccess(res, 200, 'Usuario eliminado exitosamente');
     });
 
-    static getAllUsers = asyncHandler(async (req, res) => {
-        const users = await User.getAllUsers();
-        const usersWithoutPasswords = users.map(({ password, ...rest }) => rest);
-        sendSuccess(res, 200, null, usersWithoutPasswords);
-    });
-
-    static getAllTeachers = asyncHandler(async (req, res) => {
-        const teachers = await User.getTeachers();
-        if (!Array.isArray(teachers)) {
-            throw new AppError('La respuesta de la base de datos no es un array de profesores', 500);
-        }
-
-        const teachersWithoutPassword = teachers.map(({ password, ...rest }) => rest);
-        sendSuccess(res, 200, null, teachersWithoutPassword);
-    });
-
     static getUserById = asyncHandler(async (req, res) => {
-        const { id_user } = req.params;
-        const user = await User.getUserById(id_user);
-        if (!user) throw new NotFoundError('Usuario');
-
-        const { password, ...userWithoutPassword } = user;
-        sendSuccess(res, 200, null, userWithoutPassword);
+        const user = await UserService.getUserById(req.params.id_user);
+        sendSuccess(res, 200, null, user);
     });
 
-    static getAllRoles = asyncHandler(async (req, res) => {
-        const roles = await User.getAllRoles();
+    static getAllUsers = asyncHandler(async (_req, res) => {
+        const users = await UserService.getAllUsers();
+        sendSuccess(res, 200, null, users);
+    });
+
+    static getAllTeachers = asyncHandler(async (_req, res) => {
+        const teachers = await UserService.getAllTeachers();
+        sendSuccess(res, 200, null, teachers);
+    });
+
+    static getAllRoles = asyncHandler(async (_req, res) => {
+        const roles = await UserService.getAllRoles();
         sendSuccess(res, 200, null, roles);
     });
 
-    static getAllModules = asyncHandler(async (req, res) => {
-        const modules = await User.getAllModules();
+    static getAllModules = asyncHandler(async (_req, res) => {
+        const modules = await UserService.getAllModules();
         sendSuccess(res, 200, null, modules);
     });
 
-    static getUserStats = asyncHandler(async (req, res) => {
-        const stats = await User.getUserStats();
+    static getUserStats = asyncHandler(async (_req, res) => {
+        const stats = await UserService.getUserStats();
         sendSuccess(res, 200, null, stats);
     });
 
