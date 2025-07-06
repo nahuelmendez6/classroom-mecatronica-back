@@ -4,6 +4,7 @@ import {
     getCompanies,
     createCompanyWithAddressAndContact
 } from '../controllers/company.controller.js';
+import { companyValidation } from '../utils/validation.js';
 
 const router = express.Router();
 
@@ -12,7 +13,13 @@ const router = express.Router();
 router.get('/',getCompanies);
 
 // Crear nueva empresa
-router.post('/new', createCompany);
+router.post('/new', [
+    companyValidation.name,
+    companyValidation.cuit,
+    companyValidation.sector,
+    companyValidation.description,
+    companyValidation.size
+], createCompany);
 
 // Crear empresa con direccion y contacto
 router.post("/full", createCompanyWithAddressAndContact)

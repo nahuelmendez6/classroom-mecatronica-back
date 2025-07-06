@@ -112,3 +112,24 @@ export const moduleValidation = {
     id_course: body('id_course')
         .isInt({ min: 1 }).withMessage('El ID del curso debe ser un número entero positivo')
 };
+
+export const companyValidation = {
+    name: body('name')
+        .isLength({ min: 2, max: 100 }).withMessage('El nombre de la empresa debe tener entre 2 y 100 caracteres'),
+
+    cuit: body('cuit')
+        .isLength({ min: 11, max: 11 }).withMessage('El CUIT debe tener 11 caracteres')
+        .matches(/^[0-9]+$/).withMessage('El CUIT solo puede contener números'),
+
+    sector: body('sector')
+        .optional()
+        .isString().withMessage('El sector debe ser un texto'),
+
+    description: body('description')
+        .optional()
+        .isString().withMessage('La descripción debe ser un texto'),
+
+    size: body('size')
+        .optional()
+        .isString().withMessage('El tamaño debe ser un texto')
+};
