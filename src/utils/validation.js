@@ -93,3 +93,22 @@ export const courseValidation = {
         .optional()
         .isString().withMessage('La descripción debe ser un texto')
 };
+
+export const moduleValidation = {
+    name: body('name')
+        .isLength({ min: 2, max: 100 }).withMessage('El nombre del módulo debe tener entre 2 y 100 caracteres'),
+
+    description: body('description')
+        .optional()
+        .isString().withMessage('La descripción debe ser un texto'),
+
+    duration: body('duration')
+        .isInt({ min: 1 }).withMessage('La duración debe ser un número entero positivo'),
+
+    icon_url: body('icon_url')
+        .optional()
+        .isURL().withMessage('La URL del ícono no es válida'),
+
+    id_course: body('id_course')
+        .isInt({ min: 1 }).withMessage('El ID del curso debe ser un número entero positivo')
+};
