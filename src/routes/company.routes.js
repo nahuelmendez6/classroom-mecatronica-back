@@ -2,7 +2,7 @@ import express from 'express';
 import {
     createCompany,
     getCompanies,
-    createCompanyWithAddressAndContact
+    // createCompanyWithAddressAndContact
 } from '../controllers/company.controller.js';
 import { companyValidation } from '../utils/validation.js';
 
@@ -22,6 +22,6 @@ router.post('/new', [
 ], createCompany);
 
 // Crear empresa con direccion y contacto
-router.post("/full", createCompanyWithAddressAndContact)
+// router.post("/full", createCompanyWithAddressAndContact)
 
 export default router;

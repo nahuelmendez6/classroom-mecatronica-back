@@ -1,136 +1,38 @@
-import Admin from '../models/admin.model.js';
 import { validationResult } from 'express-validator';
+import AdminService from '../services/admin.service.js';
+import { sendSuccess, sendError, sendValidationError } from '../utils/responseHandler.js';
+import { asyncHandler } from '../utils/errorHandler.js';
 
-/**
- * Controlador que maneja todas las operaciones relacionadas con administradores
- */
 class AdminController {
-    /**
-     * Crea un nuevo administrador
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
-     */
-    static async create(req, res) {
-        try {
-            // Validar los datos de entrada
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Validation error',
-                    errors: errors.array()
-                });
-            }
-
-            const admin = await Admin.create(req.body);
-            res.status(201).json({
-                success: true,
-                message: 'Admin created successfully',
-                data: admin
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error creating admin',
-                error: error.message
-            });
+    static create = asyncHandler(async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return sendValidationError(res, errors.array());
         }
-    }
 
-    /**
-     * Realiza un soft-delete de un administrador
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
-     */
-    static async delete(req, res) {
-        try {
-            const { id } = req.params;
-            await Admin.delete(id);
-            res.json({
-                success: true,
-                message: 'Admin deleted successfully'
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error deleting admin',
-                error: error.message
-            });
-        }
-    }
+        const admin = await AdminService.createAdmin(req.body);
+        sendSuccess(res, 201, 'Admin created successfully', admin);
+    });
 
-    /**
-     * Obtiene todos los administradores activos
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
-     */
-    static async getAll(req, res) {
-        try {
-            const admins = await Admin.getAll();
-            res.json({
-                success: true,
-                data: admins
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error getting admins',
-                error: error.message
-            });
-        }
-    }
+    static delete = asyncHandler(async (req, res) => {
+        await AdminService.deleteAdmin(req.params.id);
+        sendSuccess(res, 200, 'Admin deleted successfully');
+    });
 
-    /**
-     * Obtiene un administrador por su ID
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
-     */
-    static async getById(req, res) {
-        try {
-            const { id } = req.params;
-            const admin = await Admin.getById(id);
-            
-            if (!admin) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Admin not found'
-                });
-            }
+    static getAll = asyncHandler(async (req, res) => {
+        const admins = await AdminService.getAllAdmins();
+        sendSuccess(res, 200, 'Admins retrieved successfully', admins);
+    });
 
-            res.json({
-                success: true,
-                data: admin
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error getting admin',
-                error: error.message
-            });
-        }
-    }
+    static getById = asyncHandler(async (req, res) => {
+        const admin = await AdminService.getAdminById(req.params.id);
+        sendSuccess(res, 200, 'Admin retrieved successfully', admin);
+    });
 
-    /**
-     * Restaura un administrador eliminado
-     * @param {Object} req - Request object
-     * @param {Object} res - Response object
-     */
-    static async restore(req, res) {
-        try {
-            const { id } = req.params;
-            await Admin.restore(id);
-            res.json({
-                success: true,
-                message: 'Admin restored successfully'
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error restoring admin',
-                error: error.message
-            });
-        }
-    }
+    static restore = asyncHandler(async (req, res) => {
+        await AdminService.restoreAdmin(req.params.id);
+        sendSuccess(res, 200, 'Admin restored successfully');
+    });
 }
 
 export default AdminController; 
