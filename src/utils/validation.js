@@ -118,6 +118,7 @@ export const companyValidation = {
         .isLength({ min: 2, max: 100 }).withMessage('El nombre de la empresa debe tener entre 2 y 100 caracteres'),
 
     cuit: body('cuit')
+        .customSanitizer(value => value.replace(/-/g, '')) // Remove hyphens
         .isLength({ min: 11, max: 11 }).withMessage('El CUIT debe tener 11 caracteres')
         .matches(/^[0-9]+$/).withMessage('El CUIT solo puede contener números'),
 

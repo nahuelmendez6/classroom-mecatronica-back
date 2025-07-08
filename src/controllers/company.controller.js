@@ -6,6 +6,7 @@ import { asyncHandler } from '../utils/errorHandler.js';
 export const createCompany = asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+        console.error("Validation errors:", errors.array());
         return sendValidationError(res, errors.array());
     }
 
@@ -26,6 +27,7 @@ export const getCompanyById = asyncHandler(async (req, res) => {
 export const updateCompany = asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+        console.error("Validation errors:", errors.array()); // Log validation errors
         return sendValidationError(res, errors.array());
     }
 
@@ -33,7 +35,7 @@ export const updateCompany = asyncHandler(async (req, res) => {
     sendSuccess(res, 200, 'Empresa actualizada exitosamente', updatedCompany);
 });
 
-export const deleteCompany = asyncHandler(async (req, res) => {
-    await CompanyService.deleteCompany(req.params.id);
+export const softDeleteCompany = asyncHandler(async (req, res) => {
+    await CompanyService.softDeleteCompany(req.params.id);
     sendSuccess(res, 200, 'Empresa eliminada exitosamente');
 });

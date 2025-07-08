@@ -2,7 +2,9 @@ import express from 'express';
 import {
     createCompany,
     getCompanies,
-    // createCompanyWithAddressAndContact
+    getCompanyById,
+    updateCompany,
+    softDeleteCompany
 } from '../controllers/company.controller.js';
 import { companyValidation } from '../utils/validation.js';
 
@@ -21,7 +23,16 @@ router.post('/new', [
     companyValidation.size
 ], createCompany);
 
-// Crear empresa con direccion y contacto
-// router.post("/full", createCompanyWithAddressAndContact)
+// Actualizar parcialmente una empresa
+router.patch('/:id', [
+    companyValidation.name.optional(),
+    companyValidation.cuit.optional(),
+    companyValidation.sector.optional(),
+    companyValidation.description.optional(),
+    companyValidation.size.optional()
+], updateCompany);
+
+// Eliminar una empresa
+router.patch('/soft-delete/:id', softDeleteCompany);
 
 export default router;

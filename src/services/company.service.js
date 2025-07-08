@@ -1,10 +1,19 @@
+import CompanyAddress from '../models/company.address.model.js';
+import CompanyContact from '../models/company.contact.model.js';
 import Company from '../models/company.model.js';
+import Agreement from '../models/agreement.model.js';
 import { AppError, NotFoundError } from '../utils/errorHandler.js';
 
 class CompanyService {
   static async getAllCompanies() {
     try {
-      const companies = await Company.findAll();
+      const companies = await Company.findAll({
+        include: [
+          { model: CompanyAddress },
+          { model: CompanyContact },
+          { model: Agreement }
+        ]
+      });
       return companies;
     } catch (error) {
       throw new AppError('Error al obtener las empresas', 500);
@@ -41,13 +50,13 @@ class CompanyService {
     }
   }
 
-  static async deleteCompany(id) {
+  static async softDeleteCompany(id) {
     try {
       const company = await Company.findByPk(id);
       if (!company) {
         throw new NotFoundError('Empresa');
       }
-      await company.destroy();
+      await company.update({ is_deleted: true });
     } catch (error) {
       throw new AppError('Error al eliminar la empresa', 500);
     }

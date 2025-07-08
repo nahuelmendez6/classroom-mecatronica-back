@@ -26,6 +26,10 @@ const Company = sequelize.define("Company", {
     size: {
         type: DataTypes.STRING,
     },
+    is_deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
 }, {
     tableName: 'company',
     timestamps: false,

@@ -9,6 +9,7 @@ import moduleRoutes from './routes/moduleRoutes.js';
 import courseRoutes from './routes/course.routes.js';
 import companyRoutes from './routes/company.routes.js';
 import companyAddressRoutes from './routes/company.address.routes.js';
+import companyContactRoutes from './routes/company.contact.routes.js';
 import studentPracticeRoutes from './routes/studentPracticeAssignment.routes.js';
 import teacherRoutes from './routes/teacher.routes.js';
 import subModuleRoutes from './routes/sub.modules.routes.js';
@@ -78,6 +79,7 @@ app.use('/api/practice-assignments', studentPracticeRoutes); // Asignación de p
 
 // 5. Rutas de empresas: direcciones y contactos
 app.use('/api/address', companyAddressRoutes); // Direcciones de empresa
+app.use('/api/company-contacts', companyContactRoutes); // Contactos de empresa
 
 // ... resto de la configuración
 
