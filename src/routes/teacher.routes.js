@@ -1,6 +1,6 @@
 import express from 'express';
 import TeacherController from '../controllers/teacher.controller.js';
-import { verifyToken } from '../middleware/auth.middleware.js';
+import { verifyToken, checkRole } from '../middleware/auth.middleware.js';
 import { teacherValidation, userValidation } from '../utils/validation.js';
 
 const router = express.Router();
@@ -39,5 +39,8 @@ router.patch('/soft-delete/:id',
 // PATCH /api/teachers/:id - Actualizar parcialmente un profesor
 router.patch('/:id', 
     TeacherController.update);
+
+// GET /api/teacher/courses - Obtener cursos asignados al profesor autenticado
+router.get('/courses', verifyToken, checkRole(['profesor']), TeacherController.getTeacherCourses);
 
 export default router; 

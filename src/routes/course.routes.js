@@ -8,7 +8,7 @@ import {
   enrollStudent,
   getStudentsByCourse
 } from '../controllers/course.controller.js';
-import { verifyToken } from '../middleware/auth.middleware.js';
+import { verifyToken, checkRole } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
@@ -34,7 +34,7 @@ router.patch('/:id', updateCourse);
 // DELETE /api/courses/:id - Eliminar un cursoapl
 router.delete('/:id', deleteCourse);
 
-router.get('/:courseId/students', getStudentsByCourse);
+router.get('/:courseId/students', verifyToken, checkRole(['profesor']), getStudentsByCourse);
 
 
 export default router; 

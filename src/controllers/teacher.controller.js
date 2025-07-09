@@ -60,6 +60,16 @@ class TeacherController {
 
         sendSuccess(res, 200, 'Teacher updated successfully', updatedTeacher);
     });
+
+    static async getTeacherCourses(req, res) {
+        try {
+            const userId = req.user.id_user; // Assuming req.user is populated by auth middleware
+            const courses = await TeacherService.getTeacherCourses(userId);
+            sendSuccess(res, 200, 'Cursos del profesor obtenidos correctamente', courses);
+        } catch (error) {
+            sendError(res, error);
+        }
+    }
 }
 
 export default TeacherController; 

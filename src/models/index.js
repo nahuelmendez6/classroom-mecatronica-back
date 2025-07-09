@@ -19,6 +19,8 @@ import LoginAttempt from './login.attempt.model.js';
 import SubModule from './sub.module.model.js';
 import StudentCourse from './student.course.js';
 import TeacherCourse from './teacher.course.model.js';
+import Group from './group.model.js';
+import GroupStudent from './group.student.model.js';
 
 // RELACIONES (sólo después de importar todo)
 
@@ -122,6 +124,15 @@ Course.belongsToMany(Student, {
 Teacher.belongsToMany(Course, { through: TeacherCourse, foreignKey: 'id_teacher', otherKey: 'id_course' });
 Course.belongsToMany(Teacher, { through: TeacherCourse, foreignKey: 'id_course', otherKey: 'id_teacher', as: 'teachers' });
 
+Group.belongsTo(Course, { foreignKey: 'id_course' });
+Group.belongsTo(Company, { foreignKey: 'id_company' });
+
+Group.hasMany(GroupStudent, { foreignKey: 'id_group' });
+GroupStudent.belongsTo(Group, { foreignKey: 'id_group' });
+
+GroupStudent.belongsTo(Student, { foreignKey: 'id_student' });
+Student.hasMany(GroupStudent, { foreignKey: 'id_student' });
+
 export {
   sequelize,
   User,
@@ -142,4 +153,8 @@ export {
   ModuleTeacher,
   LoginAttempt,
   SubModule,
+  StudentCourse,
+  TeacherCourse,
+  Group,
+  GroupStudent
 };

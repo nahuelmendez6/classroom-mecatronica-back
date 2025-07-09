@@ -3,10 +3,39 @@ import Teacher from '../models/teacher.model.js';
 import User from '../models/user.model.js'; // Import the User model
 import Role from '../models/role.model.js';
 import sequelize from '../config/sequalize.js';
+import Course from '../models/Course.js';
+import TeacherCourse from '../models/teacher.course.model.js';
 import { AppError, NotFoundError } from '../utils/errorHandler.js';
 import { Op } from 'sequelize';
 
 class TeacherService {
+    static async getTeacherCourses(userId) {
+        try {
+            const teacher = await Teacher.findOne({ where: { id_user: userId } });
+            if (!teacher) {
+                throw new NotFoundError('Teacher');
+            }
+
+            const courses = await Course.findAll({
+                include: {
+                    model: Teacher,
+                    through: TeacherCourse,
+                    as: 'teachers',
+                    where: { id_teacher: teacher.id_teacher },
+                    attributes: [] // We don't need teacher attributes here, just to filter
+                },
+                attributes: ['id_course', 'course']
+            });
+
+            return courses;
+        } catch (error) {
+            if (error instanceof NotFoundError) {
+                throw error;
+            }
+            throw new AppError('Error al obtener los cursos del profesor', 500);
+        }
+    }
+
     static async createTeacher(teacherData) {
         try {
             const teacher = await Teacher.create(teacherData);

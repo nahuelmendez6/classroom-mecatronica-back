@@ -5,6 +5,7 @@ import Student from '../models/student.model.js';
 import sequelize from '../config/sequalize.js';
 import TeacherCourse from '../models/teacher.course.model.js';
 import Teacher from '../models/teacher.model.js';
+import User from '../models/user.model.js'; // Added
 import { AppError, NotFoundError } from '../utils/errorHandler.js';
 
 class CourseService {
@@ -144,6 +145,10 @@ class CourseService {
         through: {
           model: StudentCourse,
           attributes: ['enrollment_date', 'status']
+        },
+        include: { // Nested include for User model
+          model: User,
+          attributes: ['email'] // Only get email from User
         }
       }
     });
@@ -156,7 +161,9 @@ class CourseService {
       id_student: student.id_student,
       name: student.name,
       lastname: student.lastname,
+      email: student.User ? student.User.email : null, // Get email from User model
       dni: student.dni,
+      phone_number: student.phone_number, // phone_number is directly on Student model
       enrollment_date: student.StudentCourse.enrollment_date,
       status: student.StudentCourse.status
     }));
