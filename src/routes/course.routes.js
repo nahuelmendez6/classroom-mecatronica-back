@@ -29,7 +29,7 @@ router.post('/', createCourse);
 router.post("/enroll", enrollStudent);
 
 // PUT /api/courses/:id - Actualizar un curso
-router.put('/:id', updateCourse);
+router.patch('/:id', updateCourse);
 
 // DELETE /api/courses/:id - Eliminar un cursoapl
 router.delete('/:id', deleteCourse);

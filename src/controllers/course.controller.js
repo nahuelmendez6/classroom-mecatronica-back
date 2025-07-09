@@ -29,6 +29,12 @@ export const updateCourse = asyncHandler(async (req, res) => {
     return sendValidationError(res, errors.array());
   }
 
+  // Map id_teacher_responsible to id_teacher for the service layer
+  if (req.body.id_teacher_responsible !== undefined) {
+    req.body.id_teacher = req.body.id_teacher_responsible;
+    delete req.body.id_teacher_responsible; // Remove the original property
+  }
+
   const updatedCourse = await CourseService.updateCourse(req.params.id, req.body);
   sendSuccess(res, 200, 'Curso actualizado correctamente', updatedCourse);
 });

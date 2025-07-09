@@ -18,6 +18,7 @@ import ModuleTeacher from './module.teacher.model.js';
 import LoginAttempt from './login.attempt.model.js';
 import SubModule from './sub.module.model.js';
 import StudentCourse from './student.course.js';
+import TeacherCourse from './teacher.course.model.js';
 
 // RELACIONES (sólo después de importar todo)
 
@@ -117,6 +118,9 @@ Course.belongsToMany(Student, {
   foreignKey: 'id_course',
   otherKey: 'id_student'
 });
+
+Teacher.belongsToMany(Course, { through: TeacherCourse, foreignKey: 'id_teacher', otherKey: 'id_course' });
+Course.belongsToMany(Teacher, { through: TeacherCourse, foreignKey: 'id_course', otherKey: 'id_teacher', as: 'teachers' });
 
 export {
   sequelize,
