@@ -27,7 +27,6 @@ class CourseService {
       });
       return courses;
     } catch (error) {
-      console.error('Error in getAllCourses:', error); // Added for debugging
       throw new AppError('Error al obtener los cursos', 500);
     }
   }

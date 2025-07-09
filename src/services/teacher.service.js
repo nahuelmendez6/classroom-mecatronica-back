@@ -5,6 +5,8 @@ import Role from '../models/role.model.js';
 import sequelize from '../config/sequalize.js';
 import Course from '../models/Course.js';
 import TeacherCourse from '../models/teacher.course.model.js';
+import Company from '../models/company.model.js'; // Added
+import Group from '../models/group.model.js'; // Added
 import { AppError, NotFoundError } from '../utils/errorHandler.js';
 import { Op } from 'sequelize';
 
@@ -33,6 +35,47 @@ class TeacherService {
                 throw error;
             }
             throw new AppError('Error al obtener los cursos del profesor', 500);
+        }
+    }
+
+    static async getTeacherGroups(userId) {
+        try {
+            const teacher = await Teacher.findOne({ where: { id_user: userId } });
+            if (!teacher) {
+                throw new NotFoundError('Teacher');
+            }
+
+            // Get all courses associated with this teacher
+            const teacherCourses = await TeacherCourse.findAll({
+                where: { id_teacher: teacher.id_teacher },
+                attributes: ['id_course']
+            });
+
+            const courseIds = teacherCourses.map(tc => tc.id_course);
+
+            if (courseIds.length === 0) {
+                return []; // No courses assigned to this teacher, so no groups
+            }
+
+            // Find all groups belonging to these courses
+            const groups = await Group.findAll({
+                where: {
+                    id_course: {
+                        [Op.in]: courseIds
+                    }
+                },
+                include: [
+                    { model: Course, attributes: ['course'] },
+                    { model: Company, attributes: ['name'] }
+                ]
+            });
+
+            return groups;
+        } catch (error) {
+            if (error instanceof NotFoundError) {
+                throw error;
+            }
+            throw new AppError(`Error al obtener los grupos del profesor: ${error.message}`, 500);
         }
     }
 

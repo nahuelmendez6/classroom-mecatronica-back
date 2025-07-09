@@ -67,7 +67,17 @@ class TeacherController {
             const courses = await TeacherService.getTeacherCourses(userId);
             sendSuccess(res, 200, 'Cursos del profesor obtenidos correctamente', courses);
         } catch (error) {
-            sendError(res, error);
+            sendError(res, error.statusCode || 500, error.message);
+        }
+    }
+
+    static async getTeacherGroups(req, res) {
+        try {
+            const userId = req.user.id_user;
+            const groups = await TeacherService.getTeacherGroups(userId);
+            sendSuccess(res, 200, 'Grupos del profesor obtenidos correctamente', groups);
+        } catch (error) {
+            sendError(res, error.statusCode || 500, error.message);
         }
     }
 }

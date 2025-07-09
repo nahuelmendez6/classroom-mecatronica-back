@@ -43,4 +43,7 @@ router.patch('/:id',
 // GET /api/teacher/courses - Obtener cursos asignados al profesor autenticado
 router.get('/courses', verifyToken, checkRole(['profesor']), TeacherController.getTeacherCourses);
 
+// GET /api/teacher/groups - Obtener grupos de los cursos asignados al profesor autenticado
+router.get('/groups', verifyToken, checkRole(['profesor']), TeacherController.getTeacherGroups);
+
 export default router; 

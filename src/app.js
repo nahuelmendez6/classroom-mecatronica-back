@@ -15,6 +15,7 @@ import teacherRoutes from './routes/teacher.routes.js';
 import subModuleRoutes from './routes/sub.modules.routes.js';
 import studentCourseRoute from './routes/student.course.js';
 import studentRoutes from './routes/student.routes.js';
+import groupRoutes from './routes/group.routes.js'; // Added
 
 import sequelize from './config/sequalize.js';
 
@@ -65,7 +66,7 @@ app.use('/api/users', userRoutes);   // Usuarios
 
 // 2. Rutas de entidades principales
 app.use('/api/students', studentRoutes); // Estudiantes
-app.use('/api/teachers', teacherRoutes); // Profesores
+app.use('/api/teacher', teacherRoutes); // Profesores
 app.use('/api/companies', companyRoutes); // Empresas
 
 // 3. Rutas de módulos y submódulos
@@ -76,6 +77,7 @@ app.use('/api/sub-modules', subModuleRoutes); // Submódulos
 app.use('/api/courses', courseRoutes); // Cursos
 app.use('/api/student-course', studentCourseRoute); // Asignación estudiante-curso
 app.use('/api/practice-assignments', studentPracticeRoutes); // Asignación de prácticas
+app.use('/api/groups', groupRoutes); // Grupos
 
 // 5. Rutas de empresas: direcciones y contactos
 app.use('/api/address', companyAddressRoutes); // Direcciones de empresa

@@ -127,11 +127,8 @@ Course.belongsToMany(Teacher, { through: TeacherCourse, foreignKey: 'id_course',
 Group.belongsTo(Course, { foreignKey: 'id_course' });
 Group.belongsTo(Company, { foreignKey: 'id_company' });
 
-Group.hasMany(GroupStudent, { foreignKey: 'id_group' });
-GroupStudent.belongsTo(Group, { foreignKey: 'id_group' });
-
-GroupStudent.belongsTo(Student, { foreignKey: 'id_student' });
-Student.hasMany(GroupStudent, { foreignKey: 'id_student' });
+Group.belongsToMany(Student, { through: GroupStudent, foreignKey: 'id_group', otherKey: 'id_student' });
+Student.belongsToMany(Group, { through: GroupStudent, foreignKey: 'id_student', otherKey: 'id_group' });
 
 export {
   sequelize,
