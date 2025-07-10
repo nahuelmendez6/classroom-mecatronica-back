@@ -13,6 +13,7 @@ import companyContactRoutes from './routes/company.contact.routes.js';
 import studentPracticeRoutes from './routes/studentPracticeAssignment.routes.js';
 import teacherRoutes from './routes/teacher.routes.js';
 import subModuleRoutes from './routes/sub.modules.routes.js';
+import taskRoutes from './routes/task.routes.js';
 import studentCourseRoute from './routes/student.course.js';
 import studentRoutes from './routes/student.routes.js';
 import groupRoutes from './routes/group.routes.js'; // Added
@@ -71,7 +72,8 @@ app.use('/api/companies', companyRoutes); // Empresas
 
 // 3. Rutas de módulos y submódulos
 app.use('/api/modules', moduleRoutes);      // Módulos
-app.use('/api/sub-modules', subModuleRoutes); // Submódulos
+app.use('/api/v1/submodules', subModuleRoutes);
+app.use('/api/v1/tasks', taskRoutes); // Submódulos
 
 // 4. Rutas de cursos y asignaciones
 app.use('/api/courses', courseRoutes); // Cursos
