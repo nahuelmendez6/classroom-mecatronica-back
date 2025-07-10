@@ -21,6 +21,12 @@ import StudentCourse from './student.course.js';
 import TeacherCourse from './teacher.course.model.js';
 import Group from './group.model.js';
 import GroupStudent from './group.student.model.js';
+import TaskType from './task.type.model.js';
+import Task from './task.model.js';
+import TaskProgress from './task.progress.model.js';
+import TaskQuestionnaire from './task.questionnaire.model.js';
+import TaskSubmission from './task.submission.model.js';
+import QuestionType from './question.type.model.js';
 
 // RELACIONES (sólo después de importar todo)
 
@@ -130,6 +136,29 @@ Group.belongsTo(Company, { foreignKey: 'id_company' });
 Group.belongsToMany(Student, { through: GroupStudent, foreignKey: 'id_group', otherKey: 'id_student' });
 Student.belongsToMany(Group, { through: GroupStudent, foreignKey: 'id_student', otherKey: 'id_group' });
 
+// Task Relationships
+Task.belongsTo(Student, { foreignKey: 'id_student' });
+Task.belongsTo(Module, { foreignKey: 'id_module' });
+Task.belongsTo(TaskType, { foreignKey: 'id_task_type' });
+Task.hasMany(TaskProgress, { foreignKey: 'id_task' });
+Task.hasMany(TaskQuestionnaire, { foreignKey: 'id_task' });
+Task.hasMany(TaskSubmission, { foreignKey: 'id_task' });
+
+// TaskProgress Relationships
+TaskProgress.belongsTo(Task, { foreignKey: 'id_task' });
+TaskProgress.belongsTo(Student, { foreignKey: 'id_student' });
+
+// TaskQuestionnaire Relationships
+TaskQuestionnaire.belongsTo(Task, { foreignKey: 'id_task' });
+TaskQuestionnaire.belongsTo(QuestionType, { foreignKey: 'id_question_type' }); // Assuming QuestionType model exists
+
+// TaskSubmission Relationships
+TaskSubmission.belongsTo(Task, { foreignKey: 'id_task' });
+TaskSubmission.belongsTo(Student, { foreignKey: 'id_student' });
+
+// TaskType Relationships
+TaskType.hasMany(Task, { foreignKey: 'id_task_type' });
+
 export {
   sequelize,
   User,
@@ -153,5 +182,11 @@ export {
   StudentCourse,
   TeacherCourse,
   Group,
-  GroupStudent
+  GroupStudent,
+  TaskType,
+  Task,
+  TaskProgress,
+  TaskQuestionnaire,
+  TaskSubmission,
+  QuestionType
 };

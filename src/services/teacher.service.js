@@ -7,6 +7,7 @@ import Course from '../models/Course.js';
 import TeacherCourse from '../models/teacher.course.model.js';
 import Company from '../models/company.model.js'; // Added
 import Group from '../models/group.model.js'; // Added
+import Student from '../models/student.model.js';
 import { AppError, NotFoundError } from '../utils/errorHandler.js';
 import { Op } from 'sequelize';
 
@@ -66,7 +67,8 @@ class TeacherService {
                 },
                 include: [
                     { model: Course, attributes: ['course'] },
-                    { model: Company, attributes: ['name'] }
+                    { model: Company, attributes: ['name'] },
+                    { model: Student, through: 'group_student' }
                 ]
             });
 
