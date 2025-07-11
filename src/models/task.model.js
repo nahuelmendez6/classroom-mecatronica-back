@@ -1,6 +1,5 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/sequalize.js';
-import Student from './student.model.js';
 import Module from './module.model.js';
 import TaskType from './task.type.model.js';
 
@@ -19,20 +18,20 @@ const Task = sequelize.define('Task', {
     type: DataTypes.TEXT,
     allowNull: true,
   },
-  id_student: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Student,
-      key: 'id_student',
-    },
-  },
   id_module: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
       model: Module,
       key: 'id_module',
+    },
+  },
+  id_course: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'course', // Assuming 'course' is the name of the course model
+      key: 'id_course',
     },
   },
   start_date: {

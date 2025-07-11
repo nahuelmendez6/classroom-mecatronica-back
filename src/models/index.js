@@ -27,6 +27,9 @@ import TaskProgress from './task.progress.model.js';
 import TaskQuestionnaire from './task.questionnaire.model.js';
 import TaskSubmission from './task.submission.model.js';
 import QuestionType from './question.type.model.js';
+import QuestionOption from './question.option.model.js';
+import Query from './query.model.js';
+import QueryResponse from './query.response.model.js';
 
 // RELACIONES (sólo después de importar todo)
 
@@ -137,7 +140,7 @@ Group.belongsToMany(Student, { through: GroupStudent, foreignKey: 'id_group', ot
 Student.belongsToMany(Group, { through: GroupStudent, foreignKey: 'id_student', otherKey: 'id_group' });
 
 // Task Relationships
-Task.belongsTo(Student, { foreignKey: 'id_student' });
+
 Task.belongsTo(Module, { foreignKey: 'id_module' });
 Task.belongsTo(TaskType, { foreignKey: 'id_task_type' });
 Task.hasMany(TaskProgress, { foreignKey: 'id_task' });
@@ -151,6 +154,17 @@ TaskProgress.belongsTo(Student, { foreignKey: 'id_student' });
 // TaskQuestionnaire Relationships
 TaskQuestionnaire.belongsTo(Task, { foreignKey: 'id_task' });
 TaskQuestionnaire.belongsTo(QuestionType, { foreignKey: 'id_question_type' }); // Assuming QuestionType model exists
+
+// QuestionOption Relationships
+QuestionOption.belongsTo(TaskQuestionnaire, { foreignKey: 'id_question' });
+
+// Query Relationships
+Query.hasMany(QueryResponse, { foreignKey: 'id_query' });
+
+// QueryResponse Relationships
+QueryResponse.belongsTo(Query, { foreignKey: 'id_query' });
+QueryResponse.belongsTo(Teacher, { foreignKey: 'id_teacher' });
+
 
 // TaskSubmission Relationships
 TaskSubmission.belongsTo(Task, { foreignKey: 'id_task' });
@@ -188,5 +202,8 @@ export {
   TaskProgress,
   TaskQuestionnaire,
   TaskSubmission,
-  QuestionType
+  QuestionType,
+  QuestionOption,
+  Query,
+  QueryResponse
 };

@@ -80,6 +80,16 @@ class TeacherController {
             sendError(res, error.statusCode || 500, error.message);
         }
     }
+
+    static async getTeacherModules(req, res) {
+        try {
+            const userId = req.user.id_user;
+            const modules = await TeacherService.getTeacherModules(userId);
+            sendSuccess(res, 200, 'Módulos del profesor obtenidos correctamente', modules);
+        } catch (error) {
+            sendError(res, error.statusCode || 500, error.message);
+        }
+    }
 }
 
 export default TeacherController; 

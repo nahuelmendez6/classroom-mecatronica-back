@@ -20,7 +20,6 @@ class TaskService {
     try {
       const tasks = await Task.findAll({
         include: [
-          { model: Student, attributes: ['id_student', 'name', 'lastname'] },
           { model: Module, attributes: ['id_module', 'name'] },
           { model: TaskType, attributes: ['id_task_type', 'name'] },
         ],
@@ -35,7 +34,6 @@ class TaskService {
     try {
       const task = await Task.findByPk(id, {
         include: [
-          { model: Student, attributes: ['id_student', 'name', 'lastname'] },
           { model: Module, attributes: ['id_module', 'name'] },
           { model: TaskType, attributes: ['id_task_type', 'name'] },
           { model: TaskProgress },

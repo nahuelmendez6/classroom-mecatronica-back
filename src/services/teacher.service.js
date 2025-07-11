@@ -8,6 +8,7 @@ import TeacherCourse from '../models/teacher.course.model.js';
 import Company from '../models/company.model.js'; // Added
 import Group from '../models/group.model.js'; // Added
 import Student from '../models/student.model.js';
+import Module from '../models/module.model.js'; // Added
 import { AppError, NotFoundError } from '../utils/errorHandler.js';
 import { Op } from 'sequelize';
 
@@ -38,6 +39,7 @@ class TeacherService {
             throw new AppError('Error al obtener los cursos del profesor', 500);
         }
     }
+
 
     static async getTeacherGroups(userId) {
         try {
@@ -78,6 +80,44 @@ class TeacherService {
                 throw error;
             }
             throw new AppError(`Error al obtener los grupos del profesor: ${error.message}`, 500);
+        }
+    }
+
+    static async getTeacherModules(userId) {
+        try {
+            const teacher = await Teacher.findOne({ where: { id_user: userId } });
+            if (!teacher) {
+                throw new NotFoundError('Teacher');
+            }
+
+            const teacherCourses = await TeacherCourse.findAll({
+                where: { id_teacher: teacher.id_teacher },
+                attributes: ['id_course']
+            });
+
+            const courseIds = teacherCourses.map(tc => tc.id_course);
+
+            if (courseIds.length === 0) {
+                return [];
+            }
+
+            const modules = await Module.findAll({
+                where: {
+                    id_course: {
+                        [Op.in]: courseIds
+                    }
+                },
+                include: [
+                    { model: Course, attributes: ['course'] }
+                ]
+            });
+
+            return modules;
+        } catch (error) {
+            if (error instanceof NotFoundError) {
+                throw error;
+            }
+            throw new AppError(`Error al obtener los módulos del profesor: ${error.message}`, 500);
         }
     }
 

@@ -13,11 +13,11 @@ import companyContactRoutes from './routes/company.contact.routes.js';
 import studentPracticeRoutes from './routes/studentPracticeAssignment.routes.js';
 import teacherRoutes from './routes/teacher.routes.js';
 import subModuleRoutes from './routes/sub.modules.routes.js';
-import taskRoutes from './routes/task.routes.js';
+// import taskRoutes from './routes/task.routes.js';
 import studentCourseRoute from './routes/student.course.js';
 import studentRoutes from './routes/student.routes.js';
 import groupRoutes from './routes/group.routes.js'; // Added
-
+import taskTypeRoutes from './routes/task.types.routes.js';
 import sequelize from './config/sequalize.js';
 
 import './models/index.js';
@@ -73,7 +73,7 @@ app.use('/api/companies', companyRoutes); // Empresas
 // 3. Rutas de módulos y submódulos
 app.use('/api/modules', moduleRoutes);      // Módulos
 app.use('/api/v1/submodules', subModuleRoutes);
-app.use('/api/v1/tasks', taskRoutes); // Submódulos
+// app.use('/api/v1/tasks', taskRoutes); // Submódulos
 
 // 4. Rutas de cursos y asignaciones
 app.use('/api/courses', courseRoutes); // Cursos
@@ -84,6 +84,16 @@ app.use('/api/groups', groupRoutes); // Grupos
 // 5. Rutas de empresas: direcciones y contactos
 app.use('/api/address', companyAddressRoutes); // Direcciones de empresa
 app.use('/api/company-contacts', companyContactRoutes); // Contactos de empresa
+
+
+// 6. Rutas de tareas y tipos de tareas
+
+app.use('/api/task-types', taskTypeRoutes); // Tipos de tareas
+
+// 7. Rutas de tareas (si es necesario, se puede separar en otro archivo)
+import taskRoutes from './routes/task.routes.js';
+app.use('/api/tasks', taskRoutes); // Tareas
+
 
 // ... resto de la configuración
 

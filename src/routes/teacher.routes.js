@@ -46,4 +46,11 @@ router.get('/courses', verifyToken, checkRole(['profesor']), TeacherController.g
 // GET /api/teacher/groups - Obtener grupos de los cursos asignados al profesor autenticado
 router.get('/groups', verifyToken, checkRole(['profesor']), TeacherController.getTeacherGroups);
 
+// GET /api/teacher/modules - Obtener módulos de los cursos asignados al profesor autenticado
+router.get('/modules',  (req, res, next) => {
+  console.log("🔥 /modules llamada");
+  next();
+},
+    verifyToken, checkRole(['profesor']), TeacherController.getTeacherModules);
+
 export default router; 
