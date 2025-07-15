@@ -11,7 +11,11 @@ import companyRoutes from './routes/company.routes.js';
 import companyAddressRoutes from './routes/company.address.routes.js';
 import companyContactRoutes from './routes/company.contact.routes.js';
 import studentPracticeRoutes from './routes/studentPracticeAssignment.routes.js';
-import teacherRoutes from './routes/teacher.routes.js';
+// import teacherRoutes from './routes/teacher.routes.js';
+
+import teacherAdminRoutes from './teacher/teacher.admin.routes.js';
+import teacherSelfRoutes from './teacher/teacher.self.routes.js';
+
 import subModuleRoutes from './routes/sub.modules.routes.js';
 // import taskRoutes from './routes/task.routes.js';
 import studentCourseRoute from './routes/student.course.js';
@@ -67,7 +71,9 @@ app.use('/api/users', userRoutes);   // Usuarios
 
 // 2. Rutas de entidades principales
 app.use('/api/students', studentRoutes); // Estudiantes
-app.use('/api/teacher', teacherRoutes); // Profesores
+// app.use('/api/teacher', teacherRoutes); // Profesores
+app.use('/api/teachers', teacherAdminRoutes); // Profesores (admin)
+app.use('/api/teacher/self', teacherSelfRoutes); // Profesores (self)
 app.use('/api/companies', companyRoutes); // Empresas
 
 // 3. Rutas de módulos y submódulos

@@ -2,7 +2,8 @@ import sequelize from '../config/sequalize.js';
 import User from './user.model.js';
 import Role from './role.model.js';
 import Student from './student.model.js';
-import Teacher from './teacher.model.js';
+import Teacher from '../teacher/teacher.model.js'; // ✅ correcto
+
 import Admin from './admin.model.js';
 import Company from './company.model.js';
 import Course from './Course.js';

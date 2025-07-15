@@ -4,7 +4,7 @@ import StudentCourse from '../models/student.course.js';
 import Student from '../models/student.model.js';
 import sequelize from '../config/sequalize.js';
 import TeacherCourse from '../models/teacher.course.model.js';
-import Teacher from '../models/teacher.model.js';
+import Teacher from '../teacher/teacher.model.js'; // Import Teacher model
 import User from '../models/user.model.js'; // Added
 import { AppError, NotFoundError } from '../utils/errorHandler.js';
 

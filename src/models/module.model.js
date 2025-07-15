@@ -3,7 +3,7 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../config/sequalize.js';
 
 import SubModule from './sub.module.model.js';
-import Teacher from './teacher.model.js';
+import Teacher from '../teacher/teacher.model.js'; // Import Teacher model
 import User from './user.model.js';
 import ModuleTeacher from '../models/module.teacher.model.js';
 

@@ -1,5 +1,5 @@
 import { validationResult } from 'express-validator';
-import TeacherService from '../services/teacher.service.js';
+import TeacherService from './teacher.service.js';
 import { sendSuccess, sendError, sendValidationError } from '../utils/responseHandler.js';
 import { asyncHandler } from '../utils/errorHandler.js';
 

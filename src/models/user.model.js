@@ -7,7 +7,7 @@ import Role from './role.model.js';
 import Module from './module.model.js';
 import CompanyContact from "./company.contact.model.js";
 import Admin from './admin.model.js';
-import Teacher from './teacher.model.js';
+import Teacher from '../teacher/teacher.model.js'; // Import Teacher model
 import Student from './student.model.js'; 
 import Session from './session.model.js';
 
