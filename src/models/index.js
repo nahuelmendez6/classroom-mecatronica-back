@@ -6,7 +6,10 @@ import Teacher from '../teacher/teacher.model.js'; // ✅ correcto
 
 import Admin from './admin.model.js';
 import Company from './company.model.js';
-import Course from './Course.js';
+
+// import Course from './Course.js';
+import Course from '../course/course.model.js'; // ✅ correcto
+
 import CompanyContact from './company.contact.model.js';
 import CompanyAddress from './company.address.model.js';
 import Agreement from './agreement.model.js';
@@ -86,6 +89,19 @@ Module.hasMany(StudentPracticeAssignment, { foreignKey: 'id_module' });
 
 Session.belongsTo(User, { foreignKey: 'id_user' });
 LoginAttempt.belongsTo(User, { foreignKey: 'id_user' });
+
+
+// =======================================================================================
+
+// Relaciones de cursos
+
+
+
+
+
+
+
+// =======================================================================================
 
 Course.hasMany(Module, { foreignKey: 'id_course', as: 'modulos' });
 Module.belongsTo(Course, { foreignKey: 'id_course' });

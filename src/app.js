@@ -6,7 +6,10 @@ import adminRoutes from './routes/admin.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
 import moduleRoutes from './routes/moduleRoutes.js';
-import courseRoutes from './routes/course.routes.js';
+
+// import courseRoutes from './routes/course.routes.js';
+import courseRoutes from './course/course.routes.js';
+
 import companyRoutes from './routes/company.routes.js';
 import companyAddressRoutes from './routes/company.address.routes.js';
 import companyContactRoutes from './routes/company.contact.routes.js';
@@ -86,11 +89,19 @@ app.use('/api/modules', moduleRoutes);      // Módulos
 app.use('/api/v1/submodules', subModuleRoutes);
 // app.use('/api/v1/tasks', taskRoutes); // Submódulos
 
+// ======================================================================================
 // 4. Rutas de cursos y asignaciones
 app.use('/api/courses', courseRoutes); // Cursos
-app.use('/api/student-course', studentCourseRoute); // Asignación estudiante-curso
-app.use('/api/practice-assignments', studentPracticeRoutes); // Asignación de prácticas
-app.use('/api/groups', groupRoutes); // Grupos
+// app.use('/api/student-course', studentCourseRoute); // Asignación estudiante-curso
+// app.use('/api/practice-assignments', studentPracticeRoutes); // Asignación de prácticas
+// app.use('/api/groups', groupRoutes); // Grupos
+
+
+
+
+
+// ======================================================================================
+
 
 // 5. Rutas de empresas: direcciones y contactos
 app.use('/api/address', companyAddressRoutes); // Direcciones de empresa
