@@ -16,6 +16,11 @@ import studentPracticeRoutes from './routes/studentPracticeAssignment.routes.js'
 import teacherAdminRoutes from './teacher/teacher.admin.routes.js';
 import teacherSelfRoutes from './teacher/teacher.self.routes.js';
 
+// =============== Rutas de organización ===============
+import organizationRoutes from './organization/organization.routes.js';
+import organizationAddressRoutes from './organization/organization.address.routes.js';
+import organizationContactRoutes from './organization/organization.contact.routes.js';
+
 import subModuleRoutes from './routes/sub.modules.routes.js';
 // import taskRoutes from './routes/task.routes.js';
 import studentCourseRoute from './routes/student.course.js';
@@ -90,6 +95,11 @@ app.use('/api/groups', groupRoutes); // Grupos
 // 5. Rutas de empresas: direcciones y contactos
 app.use('/api/address', companyAddressRoutes); // Direcciones de empresa
 app.use('/api/company-contacts', companyContactRoutes); // Contactos de empresa
+
+
+app.use('/api/organizations', organizationRoutes); // Organizaciones
+app.use('/api/organization-addresses', organizationAddressRoutes); // Direcciones de organizaciones
+app.use('/api/organization-contacts', organizationContactRoutes); // Contactos de organizaciones
 
 
 // 6. Rutas de tareas y tipos de tareas

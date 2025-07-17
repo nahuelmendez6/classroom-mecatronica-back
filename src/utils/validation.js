@@ -135,6 +135,20 @@ export const companyValidation = {
         .isString().withMessage('El tamaño debe ser un texto')
 };
 
+export const organizationContactValidation = {
+    name: body('name')
+        .isLength({ min: 2, max: 100 }).withMessage('El nombre debe tener entre 2 y 100 caracteres')
+        .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/).withMessage('El nombre solo puede contener letras y espacios'),
+
+    lastname: body('lastname')
+        .isLength({ min: 2, max: 100 }).withMessage('El apellido debe tener entre 2 y 100 caracteres')
+        .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/).withMessage('El apellido solo puede contener letras y espacios'),
+
+    phone_number: body('phone_number')
+        .optional()
+        .matches(/^[0-9+\-\s()]+$/).withMessage('El número de teléfono no es válido'),
+}
+
 export const teacherValidation = {
     name: body('name')
         .isLength({ min: 2, max: 100 }).withMessage('El nombre debe tener entre 2 y 100 caracteres')

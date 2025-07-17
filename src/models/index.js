@@ -32,6 +32,13 @@ import QuestionOption from './question.option.model.js';
 import Query from './query.model.js';
 import QueryResponse from './query.response.model.js';
 
+
+// ----- modelos de organización -----
+import Organization from '../organization/organization.model.js';
+import OrganizationAddress from '../organization/organization.address.model.js';
+import OrganizationContact from '../organization/organization.contact.model.js';
+
+
 // RELACIONES (sólo después de importar todo)
 
 User.belongsTo(Role, { foreignKey: 'id_role' });
@@ -50,17 +57,22 @@ Teacher.belongsTo(User, { foreignKey: 'id_user' });
 
 Admin.belongsTo(User, { foreignKey: 'id_user' });
 
-Company.hasMany(CompanyContact, { foreignKey: 'id_company' });
-Company.hasMany(CompanyAddress, { foreignKey: 'id_company' });
-Company.hasMany(Agreement, { foreignKey: 'id_company' });
-Company.hasMany(StudentPracticeAssignment, { foreignKey: 'id_company' });
+// ========================================================================================
 
-CompanyContact.belongsTo(User, { foreignKey: 'id_user' });
-CompanyContact.belongsTo(Company, { foreignKey: 'id_company' });
+Organization.hasMany(OrganizationContact, { foreignKey: 'id_organization' });
+Organization.hasMany(OrganizationAddress, { foreignKey: 'id_organization' });
+Organization.hasMany(Agreement, { foreignKey: 'id_organization' });
+Organization.hasMany(StudentPracticeAssignment, { foreignKey: 'id_organization' });
 
-CompanyAddress.belongsTo(Company, { foreignKey: 'id_company' });
+OrganizationContact.belongsTo(User, { foreignKey: 'id_user' });
+OrganizationContact.belongsTo(Company, { foreignKey: 'id_organization' });
 
-Agreement.belongsTo(Company, { foreignKey: 'id_company' });
+OrganizationAddress.belongsTo(Organization, { foreignKey: 'id_organization' });
+
+Agreement.belongsTo(Organization, { foreignKey: 'id_organization' });
+
+
+// ========================================================================================
 
 StudentModule.belongsTo(Student, { foreignKey: 'id_student' });
 StudentModule.belongsTo(Module, { foreignKey: 'id_module' });
