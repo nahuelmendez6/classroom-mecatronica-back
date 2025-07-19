@@ -15,12 +15,12 @@ import CompanyAddress from './company.address.model.js';
 import Agreement from './agreement.model.js';
 import StudentModule from './student_module.model.js';
 import StudentPracticeAssignment from './student.practice.assignment.model.js';
-import Module from './module.model.js';
+import Module from '../modules/module.model.js';
 import Session from './session.model.js';
 import LearningMaterial from './learning.material.js';
 import ModuleTeacher from './module.teacher.model.js';
 import LoginAttempt from './login.attempt.model.js';
-import SubModule from './sub.module.model.js';
+import SubModule from '../modules/submodule.model.js';
 import StudentCourse from './student.course.js';
 import TeacherCourse from '../teacher-course/teacher.course.model.js'; 
 import Group from './group.model.js';
@@ -53,7 +53,7 @@ User.hasMany(Session, { foreignKey: 'id_user' });
 User.hasMany(LoginAttempt, { foreignKey: 'id_user' });
 
 Student.belongsTo(User, { foreignKey: 'id_user' });
-Student.hasMany(StudentModule, { foreignKey: 'id_student' });
+// Student.hasMany(StudentModule, { foreignKey: 'id_student' });
 Student.hasMany(StudentPracticeAssignment, { foreignKey: 'id_student' });
 
 Teacher.belongsTo(User, { foreignKey: 'id_user' });
@@ -77,8 +77,8 @@ Agreement.belongsTo(Organization, { foreignKey: 'id_organization' });
 
 // ========================================================================================
 
-StudentModule.belongsTo(Student, { foreignKey: 'id_student' });
-StudentModule.belongsTo(Module, { foreignKey: 'id_module' });
+// StudentModule.belongsTo(Student, { foreignKey: 'id_student' });
+// StudentModule.belongsTo(Module, { foreignKey: 'id_module' });
 
 StudentPracticeAssignment.belongsTo(Student, { foreignKey: 'id_student' });
 StudentPracticeAssignment.belongsTo(Company, { foreignKey: 'id_company' });
@@ -86,6 +86,12 @@ StudentPracticeAssignment.belongsTo(Module, { foreignKey: 'id_module' });
 
 Module.hasMany(StudentModule, { foreignKey: 'id_module' });
 Module.hasMany(StudentPracticeAssignment, { foreignKey: 'id_module' });
+Module.hasMany(SubModule, {
+  foreignKey: 'id_module',
+  as: 'submodules',
+  onDelete: 'CASCADE'
+});
+
 
 Session.belongsTo(User, { foreignKey: 'id_user' });
 LoginAttempt.belongsTo(User, { foreignKey: 'id_user' });
@@ -105,11 +111,7 @@ LoginAttempt.belongsTo(User, { foreignKey: 'id_user' });
 
 Course.hasMany(Module, { foreignKey: 'id_course', as: 'modulos' });
 Module.belongsTo(Course, { foreignKey: 'id_course' });
-Module.hasMany(SubModule, {
-  foreignKey: 'id_module',
-  as: 'submodules',
-  onDelete: 'CASCADE'
-});
+
 
 SubModule.belongsTo(Module, { 
   foreignKey: 'id_module',
@@ -213,7 +215,7 @@ export {
   CompanyContact,
   CompanyAddress,
   Agreement,
-  StudentModule,
+  // StudentModule,
   StudentPracticeAssignment,
   Module,
   Session,

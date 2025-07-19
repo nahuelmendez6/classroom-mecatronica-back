@@ -5,7 +5,10 @@ import dotenv from 'dotenv';
 import adminRoutes from './routes/admin.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
-import moduleRoutes from './routes/moduleRoutes.js';
+
+
+
+import moduleRoutes from './modules/module.routes.js';
 
 
 
@@ -92,7 +95,10 @@ app.use('/api/teacher/self', teacherSelfRoutes); // Profesores (self)
 app.use('/api/companies', companyRoutes); // Empresas
 
 // 3. Rutas de módulos y submódulos
-app.use('/api/modules', moduleRoutes);      // Módulos
+       // Módulos
+
+app.use('/api/modules', moduleRoutes);
+
 app.use('/api/v1/submodules', subModuleRoutes);
 // app.use('/api/v1/tasks', taskRoutes); // Submódulos
 
