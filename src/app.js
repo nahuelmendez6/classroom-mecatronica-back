@@ -7,8 +7,15 @@ import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
 import moduleRoutes from './routes/moduleRoutes.js';
 
+
+
+//| Importación de rutas de cursos y profesores
+
 // import courseRoutes from './routes/course.routes.js';
 import courseRoutes from './course/course.routes.js';
+import teacherCourseRoutes from './teacher-course/teacher.course.routes.js';
+
+
 
 import companyRoutes from './routes/company.routes.js';
 import companyAddressRoutes from './routes/company.address.routes.js';
@@ -92,6 +99,9 @@ app.use('/api/v1/submodules', subModuleRoutes);
 // ======================================================================================
 // 4. Rutas de cursos y asignaciones
 app.use('/api/courses', courseRoutes); // Cursos
+
+app.use('/api/teacher-courses', teacherCourseRoutes); // Cursos de profesores
+
 // app.use('/api/student-course', studentCourseRoute); // Asignación estudiante-curso
 // app.use('/api/practice-assignments', studentPracticeRoutes); // Asignación de prácticas
 // app.use('/api/groups', groupRoutes); // Grupos
