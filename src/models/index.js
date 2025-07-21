@@ -20,7 +20,7 @@ import Session from './session.model.js';
 import LearningMaterial from './learning.material.js';
 import ModuleTeacher from './module.teacher.model.js';
 import LoginAttempt from './login.attempt.model.js';
-import SubModule from '../modules/submodule.model.js';
+import SubModule from '../modules/sub.module.model.js';
 import StudentCourse from './student.course.js';
 import TeacherCourse from '../teacher-course/teacher.course.model.js'; 
 import Group from './group.model.js';

@@ -34,7 +34,8 @@ import organizationRoutes from './organization/organization.routes.js';
 import organizationAddressRoutes from './organization/organization.address.routes.js';
 import organizationContactRoutes from './organization/organization.contact.routes.js';
 
-import subModuleRoutes from './routes/sub.modules.routes.js';
+import subModuleRoutes from './modules/sub.module.routes.js';
+
 // import taskRoutes from './routes/task.routes.js';
 import studentCourseRoute from './routes/student.course.js';
 import studentRoutes from './routes/student.routes.js';
@@ -99,7 +100,7 @@ app.use('/api/companies', companyRoutes); // Empresas
 
 app.use('/api/modules', moduleRoutes);
 
-app.use('/api/v1/submodules', subModuleRoutes);
+app.use('/api/submodules', subModuleRoutes);
 // app.use('/api/v1/tasks', taskRoutes); // Submódulos
 
 // ======================================================================================

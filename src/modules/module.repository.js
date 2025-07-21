@@ -1,5 +1,5 @@
 import Module from './module.model.js';
-import SubModule from './submodule.model.js';
+import SubModule from './sub.module.model.js';
 import sequelize from '../config/sequalize.js';
 import { QueryTypes } from 'sequelize';
 
