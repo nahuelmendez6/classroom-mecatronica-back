@@ -38,7 +38,7 @@ import subModuleRoutes from './modules/sub.module.routes.js';
 
 // import taskRoutes from './routes/task.routes.js';
 import studentCourseRoute from './routes/student.course.js';
-import studentRoutes from './routes/student.routes.js';
+import studentRoutes from './student/student.routes.js';
 import groupRoutes from './routes/group.routes.js'; // Added
 import taskTypeRoutes from './routes/task.types.routes.js';
 import sequelize from './config/sequalize.js';

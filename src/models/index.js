@@ -45,14 +45,14 @@ import OrganizationContact from '../organization/organization.contact.model.js';
 // RELACIONES (sólo después de importar todo)
 
 User.belongsTo(Role, { foreignKey: 'id_role' });
-User.hasOne(Student, { foreignKey: 'id_user' });
+User.hasOne(Student, { foreignKey: 'id_user', as: 'user' });
 User.hasOne(Teacher, { foreignKey: 'id_user' });
 User.hasOne(Admin, { foreignKey: 'id_user' });
 User.hasOne(CompanyContact, { foreignKey: 'id_user' });
 User.hasMany(Session, { foreignKey: 'id_user' });
 User.hasMany(LoginAttempt, { foreignKey: 'id_user' });
 
-Student.belongsTo(User, { foreignKey: 'id_user' });
+Student.belongsTo(User, { foreignKey: 'id_user', as: 'user' });
 // Student.hasMany(StudentModule, { foreignKey: 'id_student' });
 Student.hasMany(StudentPracticeAssignment, { foreignKey: 'id_student' });
 
