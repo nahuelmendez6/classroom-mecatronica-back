@@ -1,7 +1,7 @@
 import sequelize from '../config/sequalize.js';
 import User from './user.model.js';
 import Role from './role.model.js';
-import Student from './student.model.js';
+import Student from '../student/student.model.js';
 import Teacher from '../teacher/teacher.model.js'; // ✅ correcto
 
 import Admin from '../admin/admin.model.js';
@@ -21,7 +21,7 @@ import LearningMaterial from './learning.material.js';
 import ModuleTeacher from './module.teacher.model.js';
 import LoginAttempt from './login.attempt.model.js';
 import SubModule from '../modules/sub.module.model.js';
-import StudentCourse from './student.course.js';
+import StudentCourse from '../student-course/student.course.model.js';
 import TeacherCourse from '../teacher-course/teacher.course.model.js'; 
 import Group from './group.model.js';
 import GroupStudent from './group.student.model.js';
@@ -45,7 +45,7 @@ import OrganizationContact from '../organization/organization.contact.model.js';
 // RELACIONES (sólo después de importar todo)
 
 User.belongsTo(Role, { foreignKey: 'id_role' });
-User.hasOne(Student, { foreignKey: 'id_user', as: 'user' });
+User.hasOne(Student, { foreignKey: 'id_user', as: 'student' });
 User.hasOne(Teacher, { foreignKey: 'id_user' });
 User.hasOne(Admin, { foreignKey: 'id_user' });
 User.hasOne(CompanyContact, { foreignKey: 'id_user' });

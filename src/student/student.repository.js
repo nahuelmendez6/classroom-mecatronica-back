@@ -1,4 +1,4 @@
-import Student from '../models/student.model.js';
+import Student from './student.model.js';
 import User from '../models/user.model.js';
 import { Op } from 'sequelize';
 

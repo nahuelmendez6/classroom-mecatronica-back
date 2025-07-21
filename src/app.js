@@ -37,7 +37,7 @@ import organizationContactRoutes from './organization/organization.contact.route
 import subModuleRoutes from './modules/sub.module.routes.js';
 
 // import taskRoutes from './routes/task.routes.js';
-import studentCourseRoute from './routes/student.course.js';
+import studentCourseRoute from './student-course/student.course.routes.js';
 import studentRoutes from './student/student.routes.js';
 import groupRoutes from './routes/group.routes.js'; // Added
 import taskTypeRoutes from './routes/task.types.routes.js';
@@ -106,6 +106,8 @@ app.use('/api/submodules', subModuleRoutes);
 // ======================================================================================
 // 4. Rutas de cursos y asignaciones
 app.use('/api/courses', courseRoutes); // Cursos
+app.use('/api/student-courses', studentCourseRoute);
+
 
 app.use('/api/teacher-courses', teacherCourseRoutes); // Cursos de profesores
 
