@@ -23,7 +23,7 @@ import LoginAttempt from './login.attempt.model.js';
 import SubModule from '../modules/sub.module.model.js';
 import StudentCourse from '../student-course/student.course.model.js';
 import TeacherCourse from '../teacher-course/teacher.course.model.js'; 
-import Group from './group.model.js';
+import Group from '../group/group.model.js';
 import GroupStudent from './group.student.model.js';
 import TaskType from './task.type.model.js';
 import Task from './task.model.js';
@@ -66,6 +66,7 @@ Organization.hasMany(OrganizationContact, { foreignKey: 'id_organization' });
 Organization.hasMany(OrganizationAddress, { foreignKey: 'id_organization' });
 Organization.hasMany(Agreement, { foreignKey: 'id_organization' });
 Organization.hasMany(StudentPracticeAssignment, { foreignKey: 'id_organization' });
+Organization.hasMany(Group, {foreignKey: 'id_organization'});
 
 OrganizationContact.belongsTo(User, { foreignKey: 'id_user' });
 OrganizationContact.belongsTo(Company, { foreignKey: 'id_organization' });
@@ -165,7 +166,7 @@ Teacher.belongsToMany(Course, { through: TeacherCourse, foreignKey: 'id_teacher'
 Course.belongsToMany(Teacher, { through: TeacherCourse, foreignKey: 'id_course', otherKey: 'id_teacher', as: 'teachers' });
 
 Group.belongsTo(Course, { foreignKey: 'id_course' });
-Group.belongsTo(Company, { foreignKey: 'id_company' });
+Group.belongsTo(Organization, { foreignKey: 'id_organization' });
 
 Group.belongsToMany(Student, { through: GroupStudent, foreignKey: 'id_group', otherKey: 'id_student' });
 Student.belongsToMany(Group, { through: GroupStudent, foreignKey: 'id_student', otherKey: 'id_group' });

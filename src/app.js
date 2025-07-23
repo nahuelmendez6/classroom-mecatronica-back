@@ -39,7 +39,7 @@ import subModuleRoutes from './modules/sub.module.routes.js';
 // import taskRoutes from './routes/task.routes.js';
 import studentCourseRoute from './student-course/student.course.routes.js';
 import studentRoutes from './student/student.routes.js';
-import groupRoutes from './routes/group.routes.js'; // Added
+import groupRoutes from './group/group.routes.js'; // Added
 import taskTypeRoutes from './routes/task.types.routes.js';
 import sequelize from './config/sequalize.js';
 
@@ -116,7 +116,9 @@ app.use('/api/teacher-courses', teacherCourseRoutes); // Cursos de profesores
 // app.use('/api/groups', groupRoutes); // Grupos
 
 
-
+// ======================================================================================
+// Rutas de grupos
+app.use('/api/group', groupRoutes)
 
 
 // ======================================================================================
