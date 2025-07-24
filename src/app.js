@@ -19,11 +19,7 @@ import courseRoutes from './course/course.routes.js';
 import teacherCourseRoutes from './teacher-course/teacher.course.routes.js';
 
 
-
-import companyRoutes from './routes/company.routes.js';
-import companyAddressRoutes from './routes/company.address.routes.js';
-import companyContactRoutes from './routes/company.contact.routes.js';
-import studentPracticeRoutes from './routes/studentPracticeAssignment.routes.js';
+import practiceAssignmentRoutes from './practice/practice.assignment.routes.js';
 // import teacherRoutes from './routes/teacher.routes.js';
 
 import teacherAdminRoutes from './teacher/teacher.admin.routes.js';
@@ -96,7 +92,7 @@ app.use('/api/students', studentRoutes); // Estudiantes
 // app.use('/api/teacher', teacherRoutes); // Profesores
 app.use('/api/teachers', teacherAdminRoutes); // Profesores (admin)
 app.use('/api/teacher/self', teacherSelfRoutes); // Profesores (self)
-app.use('/api/companies', companyRoutes); // Empresas
+// app.use('/api/companies', companyRoutes); // Empresas
 
 // 3. Rutas de módulos y submódulos
        // Módulos
@@ -128,13 +124,19 @@ app.use('/api/group-student', studentGroupRoutes)
 
 
 // 5. Rutas de empresas: direcciones y contactos
-app.use('/api/address', companyAddressRoutes); // Direcciones de empresa
-app.use('/api/company-contacts', companyContactRoutes); // Contactos de empresa
+// app.use('/api/address', companyAddressRoutes); // Direcciones de empresa
+// app.use('/api/company-contacts', companyContactRoutes); // Contactos de empresa
 
 
 app.use('/api/organizations', organizationRoutes); // Organizaciones
 app.use('/api/organization-addresses', organizationAddressRoutes); // Direcciones de organizaciones
 app.use('/api/organization-contacts', organizationContactRoutes); // Contactos de organizaciones
+
+
+
+// =======================================================================================
+// ------------- Rutas de practicas --------------
+app.use('/api/practice-assignment', practiceAssignmentRoutes)
 
 
 // 6. Rutas de tareas y tipos de tareas

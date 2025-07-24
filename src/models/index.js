@@ -37,6 +37,9 @@ import QuestionOption from './question.option.model.js';
 import Query from './query.model.js';
 import QueryResponse from './query.response.model.js';
 
+// ----- Modelos de practicas --------
+import PracticeAssignment from '../practice/practice.assignment.model.js';
+
 
 // ----- modelos de organización -----
 import Organization from '../organization/organization.model.js';
@@ -56,7 +59,7 @@ User.hasMany(LoginAttempt, { foreignKey: 'id_user' });
 
 Student.belongsTo(User, { foreignKey: 'id_user', as: 'user' });
 // Student.hasMany(StudentModule, { foreignKey: 'id_student' });
-Student.hasMany(StudentPracticeAssignment, { foreignKey: 'id_student' });
+Student.hasMany(PracticeAssignment, { foreignKey: 'id_student' });
 
 Teacher.belongsTo(User, { foreignKey: 'id_user' });
 
@@ -67,7 +70,7 @@ Admin.belongsTo(User, { foreignKey: 'id_user' });
 Organization.hasMany(OrganizationContact, { foreignKey: 'id_organization' });
 Organization.hasMany(OrganizationAddress, { foreignKey: 'id_organization' });
 Organization.hasMany(Agreement, { foreignKey: 'id_organization' });
-Organization.hasMany(StudentPracticeAssignment, { foreignKey: 'id_organization' });
+Organization.hasMany(PracticeAssignment, { foreignKey: 'id_organization' });
 Organization.hasMany(Group, {foreignKey: 'id_organization'});
 
 OrganizationContact.belongsTo(User, { foreignKey: 'id_user' });
@@ -83,9 +86,14 @@ Agreement.belongsTo(Organization, { foreignKey: 'id_organization' });
 // StudentModule.belongsTo(Student, { foreignKey: 'id_student' });
 // StudentModule.belongsTo(Module, { foreignKey: 'id_module' });
 
-StudentPracticeAssignment.belongsTo(Student, { foreignKey: 'id_student' });
-StudentPracticeAssignment.belongsTo(Company, { foreignKey: 'id_company' });
-StudentPracticeAssignment.belongsTo(Module, { foreignKey: 'id_module' });
+PracticeAssignment.belongsTo(Student, { foreignKey: 'id_student', as:'student' });
+PracticeAssignment.belongsTo(Group, { foreignKey: 'id_group', as: 'group'});
+PracticeAssignment.belongsTo(Organization, {
+  foreignKey: 'id_organization',
+  as: 'organization'
+});
+
+
 
 Module.hasMany(StudentModule, { foreignKey: 'id_module' });
 Module.hasMany(StudentPracticeAssignment, { foreignKey: 'id_module' });
@@ -169,6 +177,8 @@ Course.belongsToMany(Teacher, { through: TeacherCourse, foreignKey: 'id_course',
 
 Group.belongsTo(Course, { foreignKey: 'id_course' });
 Group.belongsTo(Organization, { foreignKey: 'id_organization' });
+Group.hasMany(PracticeAssignment, {foreignKey: 'id_group',as: 'practice_assignments'});
+
 
 Group.belongsToMany(Student, { through: GroupStudent, foreignKey: 'id_group', otherKey: 'id_student' });
 Student.belongsToMany(Group, { through: GroupStudent, foreignKey: 'id_student', otherKey: 'id_group' });
