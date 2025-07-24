@@ -23,8 +23,10 @@ import LoginAttempt from './login.attempt.model.js';
 import SubModule from '../modules/sub.module.model.js';
 import StudentCourse from '../student-course/student.course.model.js';
 import TeacherCourse from '../teacher-course/teacher.course.model.js'; 
+
 import Group from '../group/group.model.js';
-import GroupStudent from './group.student.model.js';
+import GroupStudent from '../group/group.student.model.js';
+
 import TaskType from './task.type.model.js';
 import Task from './task.model.js';
 import TaskProgress from './task.progress.model.js';
