@@ -6,7 +6,7 @@ import OrganizationController from '../organization/organization.controller.js';
 const router = express.Router();
 
 // Middleware to verify token and check role
-router.use(verifyToken, checkRole(['administrador']));
+router.use(verifyToken, checkRole(['administrador', 'profesor']));
 
 router.post('/', OrganizationController.create);
 router.get('/', OrganizationController.getAll);

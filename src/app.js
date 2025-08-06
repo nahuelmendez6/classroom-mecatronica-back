@@ -1,5 +1,7 @@
 // Importación de dependencias necesarias
 import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import adminRoutes from './admin/admin.routes.js';
@@ -10,6 +12,8 @@ import userRoutes from './routes/user.routes.js';
 
 import moduleRoutes from './modules/module.routes.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 
 //| Importación de rutas de cursos y profesores
@@ -42,6 +46,16 @@ import studentGroupRoutes from './group/group.student.routes.js'
 import taskTypeRoutes from './routes/task.types.routes.js';
 import sequelize from './config/sequalize.js';
 
+
+
+import activitiesRoutes from './activity/activity.routes.js';
+import activityReponseRoutes from './activity-response/activity.response.routes.js';
+
+
+import logentryRoutes from './log-entry/log.entry.routes.js';
+import logentryfileRoutes from './log-entry/log.entry.file.routes.js';
+
+
 import './models/index.js';
 import { ValidationError } from 'sequelize';
 import { AppError, NotFoundError, ConflictError } from './utils/errorHandler.js';
@@ -60,14 +74,18 @@ console.log('DB_HOST:', process.env.DB_HOST);
 
 
 // Inicialización de la aplicación Express
-const app = express();
 
+
+
+const app = express();
+// const path = path();
 
 sequelize.sync({ alter: false }) // O false si no querés modificar la estructura
   .then(() => console.log('Modelos sincronizados con la base de datos'))
   .catch(err => console.error('Error sincronizando modelos:', err));
 
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Configuración de middleware
 // CORS: Permite solicitudes desde diferentes orígenes
@@ -146,6 +164,22 @@ app.use('/api/task-types', taskTypeRoutes); // Tipos de tareas
 // 7. Rutas de tareas (si es necesario, se puede separar en otro archivo)
 import taskRoutes from './routes/task.routes.js';
 app.use('/api/tasks', taskRoutes); // Tareas
+
+
+// ============================================================================================
+// ------------------ Rutas de actividades/tareas ---------------------------------------------
+
+app.use('/api/activity', activitiesRoutes);
+app.use('/api/activity-responses', activityReponseRoutes);
+
+// ============================================================================================
+// ------------------ Rutas de bitacoras ----------------------------------
+
+app.use('/api/log-entry', logentryRoutes);
+app.use('/api/log-entry/files', logentryfileRoutes);
+
+
+
 
 
 // ... resto de la configuración

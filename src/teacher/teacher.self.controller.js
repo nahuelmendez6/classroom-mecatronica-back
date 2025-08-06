@@ -3,18 +3,21 @@ import {
   getTeacherGroups,
   getTeacherModules,  
 } from './teacher.service.js'
+
+import { findCoursesByTeacher } from './teacher.repository.js';
+
 import { sendSuccess, sendError } from '../utils/responseHandler.js';
 
 class TeacherSelfController {
   static async getTeacherCourses(req, res) {
-    try {
-      const userId = req.user.id_user;
-      const courses = await getTeacherCourses(userId);
-      sendSuccess(res, 200, 'Cursos del profesor obtenidos correctamente', courses);
-    } catch (error) {
-      sendError(res, error.statusCode || 500, error.message);
-    }
+  try {
+    const userId = req.user.id_user;
+    const courses = await getTeacherCourses(userId); // <-- usar el método correcto aquí
+    sendSuccess(res, 200, 'Cursos del profesor obtenidos correctamente', courses);
+  } catch (error) {
+    sendError(res, error.statusCode || 500, error.message);
   }
+}
 
   static async getTeacherGroups(req, res) {
     try {

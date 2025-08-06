@@ -23,12 +23,23 @@ class OrganizationController {
     });
 
     static getAll = asyncHandler(async (req, res) => {
-        const organizations = await findAll();
-        res.status(200).json({
-            message: 'Organizations retrieved successfully',
-            data: organizations
-        });
-    })
+        try {
+            const organizations = await findAll();
+            res.status(200).json({
+                message: 'Organizations retrieved successfully',
+                data: organizations
+            });
+        } catch (err) {
+            console.error('🔥 Error en getAll:', err);
+            res.status(500).json({
+                success: false,
+                message: 'Error interno del servidor',
+                error: err.message,
+                stack: err.stack
+            });
+        }
+    });
+
 
     static getById = asyncHandler(async (req, res) => {
         const organization = await findById(req.params.id);

@@ -24,6 +24,7 @@ export async function findCoursesByTeacher(teacherId) {
       where: { id_teacher: teacherId },
       attributes: []
     },
+    
     attributes: ['id_course', 'course']
   });
 }
@@ -34,6 +35,7 @@ export async function findGroupsByTeacherCourses(coursesIds) {
             id_course: {
                 [Op.in]: coursesIds
             }
+            
         },
         include: [
             { model: Course, attributes: ['course']},
@@ -61,4 +63,34 @@ export async function findAll() {
             attributes: ['email']
         }]
     });
+}
+
+export async function updateTeacher(id_teacher, data) {
+    // Buscar el docente con su usuario asociado
+    const teacher = await Teacher.findByPk(id_teacher, {
+        include: [{ model: User }]
+    });
+
+    if (!teacher) {
+        throw new Error('Teacher not found');
+    }
+
+    // Actualizar campos del modelo Teacher
+    await teacher.update({
+        name: data.name ?? teacher.name,
+        lastname: data.lastname ?? teacher.lastname,
+        phone_number: data.phone_number ?? teacher.phone_number,
+        observations: data.observations ?? teacher.observations,
+        is_deleted: data.is_deleted ?? teacher.is_deleted
+    });
+
+    // Si hay datos para actualizar el usuario asociado
+    if (data.user && teacher.User) {
+        await teacher.User.update({
+            email: data.user.email ?? teacher.User.email,
+            // otros campos que permitas modificar del usuario
+        });
+    }
+
+    return teacher;
 }

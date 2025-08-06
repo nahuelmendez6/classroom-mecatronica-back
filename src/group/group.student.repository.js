@@ -1,9 +1,35 @@
 import GroupStudent from './group.student.model.js';
+import Student from '../student/student.model.js';
+import Group from '../group/group.model.js';
+import Organization from '../organization/organization.model.js';
 
 const groupStudentRepository = {
   async findAll() {
-    return await GroupStudent.findAll();
-  },
+  try {
+    return await GroupStudent.findAll({
+      include: [
+        {
+          model: Student,
+          attributes: ['id_student', 'name', 'lastname', 'dni', 'phone_number']
+        },
+        {
+          model: Group,
+          attributes: ['id_group', 'group_name'],
+          include: [
+            {
+              model: Organization,
+              attributes: ['id_organization', 'name']
+            }
+          ]
+        }
+      ]
+    });
+  } catch (error) {
+    console.error('Error in findAll:', error);
+    throw new Error('Error fetching group-student records');
+  }
+}
+,
 
   async findByGroupId(id_group) {
     return await GroupStudent.findAll({ where: { id_group } });

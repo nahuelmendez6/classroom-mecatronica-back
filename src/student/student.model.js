@@ -32,6 +32,11 @@ const Student = sequelize.define('Student', {
   observations: {
     type: DataTypes.TEXT,
     allowNull: true
+  },
+  is_deleted: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true
   }
 }, {
   tableName: 'student',

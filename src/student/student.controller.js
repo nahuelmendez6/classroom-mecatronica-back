@@ -1,16 +1,37 @@
 import { createStudentWithUser } from './student.service.js';
 import StudentRepository from './student.repository.js';
+import { validationResult } from 'express-validator';
+import { sendSuccess } from '../utils/responseHandler.js';
 
 class StudentController {
   // Crear estudiante junto a su usuario
+  // async create(req, res) {
+  //   try {
+  //     const student = await createStudentWithUser(req.body);
+  //     return res.status(201).json(student);
+  //   } catch (error) {
+  //     return res.status(error.statusCode || 500).json({ message: error.message });
+  //   }
+  // }
   async create(req, res) {
     try {
-      const student = await createStudentWithUser(req.body);
-      return res.status(201).json(student);
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return sendValidationError(res, errors.array());
+      }
+
+      const newStudent = await createStudentWithUser(req.body);
+      sendSuccess(res, 201, 'Estudiante creado y asignado al curso exitosamente.', newStudent);
+
     } catch (error) {
-      return res.status(error.statusCode || 500).json({ message: error.message });
+      console.error('Error en create Student:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor al crear el estudiante.',
+        error: error.message,
+      });
     }
-  }
+  };
 
   // Obtener todos los estudiantes
   async findAll(req, res) {

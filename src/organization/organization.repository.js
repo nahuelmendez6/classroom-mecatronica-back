@@ -1,8 +1,16 @@
 import Organization from "./organization.model.js";
+import OrganizationContact from "./organization.contact.model.js";
 
 export async function findAll() {
     return await Organization.findAll({
         attributes: ['id_organization', 'name', 'cuit', 'sector', 'description', 'size', 'is_deleted'],
+        include: [
+            {
+                model: OrganizationContact,
+                attributes: ['id_contact', 'name', 'last_name', 'email', 'phone'], // ajustá según tus columnas reales
+                required: false 
+            }
+        ]
     }); 
 }
 

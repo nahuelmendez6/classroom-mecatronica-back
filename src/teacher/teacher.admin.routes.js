@@ -10,7 +10,7 @@ import { check } from 'express-validator';
 const router = Router();
 
 // Todas las rutas requieren autenticación
-router.use(verifyToken, checkRole(['admin']));
+router.use(verifyToken, checkRole(['administrador', 'profesor']));
 
 // router.get('/', TeacherAdminController.getAll);
 // router.get('/:id', TeacherAdminController.getById);
@@ -23,7 +23,7 @@ router.use(verifyToken, checkRole(['admin']));
 //     teacherValidation.phone_number,
 //     teacherValidation.observations
 // ], teacherAdminController.create);
-
+router.get('/', TeacherAdminController.getAll);
 
 router.post('/full', [
     teacherValidation.name,
@@ -35,7 +35,7 @@ router.post('/full', [
     userValidation.dni
 ], TeacherAdminController.createWithUser);
 
-// router.patch('/:id', teacherAdminController.update);
+router.patch('/:id', TeacherAdminController.update);
 // router.patch('/soft-delete/:id', teacherAdminController.softDelete);
 // router.patch('/restore/:id', teacherAdminController.restore);
 

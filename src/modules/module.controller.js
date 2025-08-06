@@ -29,6 +29,21 @@ class ModuleController {
     }
   }
 
+  static async getByCourseId(req, res) {
+    try {
+      const { id } = req.params;
+      const modules = await ModuleRepository.findByCourseId(id);
+      
+      if (modules.length === 0) {
+        return sendError(res, 404, 'No se encontraron módulos para este curso');
+      }
+
+      sendSuccess(res, 200, 'Módulos obtenidos correctamente', modules);
+    } catch (error) {
+      sendError(res, 500, error.message)
+    }
+  }
+
   // Crear un nuevo módulo
   static async create(req, res) {
     try {

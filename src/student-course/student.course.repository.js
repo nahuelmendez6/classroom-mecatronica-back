@@ -1,4 +1,5 @@
 import StudentCourse from './student.course.model.js';
+import { Student, User } from '../models/index.js';
 
 class StudentCourseRepository {
   // Obtener todas las inscripciones
@@ -36,7 +37,24 @@ class StudentCourseRepository {
 
   // Buscar inscripciones por curso
   async findByCourseId(id_course) {
-    return await StudentCourse.findAll({ where: { id_course } });
+    // return await StudentCourse.findAll({ where: { id_course } });
+     return await StudentCourse.findAll({
+      where: { id_course },
+      include: [
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['id_student', 'name', 'lastname', 'dni', 'phone_number', 'observations'],
+          include: [
+            {
+              model: User,
+              as: 'user_student',
+              attributes: ['id_user', 'email']
+            }
+          ]
+        }
+      ]
+    });
   }
 }
 

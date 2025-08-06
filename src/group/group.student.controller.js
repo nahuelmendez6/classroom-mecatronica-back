@@ -11,6 +11,8 @@ const groupStudentController = {
     }
   },
 
+  
+
   async getByGroupId(req, res) {
     try {
       const { id_group } = req.params;

@@ -27,6 +27,12 @@ import TeacherCourse from '../teacher-course/teacher.course.model.js';
 import Group from '../group/group.model.js';
 import GroupStudent from '../group/group.student.model.js';
 
+import Activity from '../activity/activity.model.js';
+import ActivityResponse from '../activity-response/activity.response.model.js';
+import ActivityResponseAttachment from '../activity-response/activity.response.attachment.js';
+import LogEntry from '../log-entry/log.entry.model.js';
+import LogEntryFile from '../log-entry/log.entry.file.js';
+
 import TaskType from './task.type.model.js';
 import Task from './task.model.js';
 import TaskProgress from './task.progress.model.js';
@@ -62,19 +68,20 @@ Student.belongsTo(User, { foreignKey: 'id_user', as: 'user' });
 Student.hasMany(PracticeAssignment, { foreignKey: 'id_student' });
 
 Teacher.belongsTo(User, { foreignKey: 'id_user' });
+Teacher.hasMany(Activity, { foreignKey: 'id_teacher'});
 
 Admin.belongsTo(User, { foreignKey: 'id_user' });
 
 // ========================================================================================
 
-Organization.hasMany(OrganizationContact, { foreignKey: 'id_organization' });
+Organization.hasMany(OrganizationContact, { foreignKey: 'id_company' });
 Organization.hasMany(OrganizationAddress, { foreignKey: 'id_organization' });
 Organization.hasMany(Agreement, { foreignKey: 'id_organization' });
 Organization.hasMany(PracticeAssignment, { foreignKey: 'id_organization' });
 Organization.hasMany(Group, {foreignKey: 'id_organization'});
 
 OrganizationContact.belongsTo(User, { foreignKey: 'id_user' });
-OrganizationContact.belongsTo(Company, { foreignKey: 'id_organization' });
+OrganizationContact.belongsTo(Organization, { foreignKey: 'id_company' });
 
 OrganizationAddress.belongsTo(Organization, { foreignKey: 'id_organization' });
 
@@ -102,6 +109,8 @@ Module.hasMany(SubModule, {
   as: 'submodules',
   onDelete: 'CASCADE'
 });
+Module.hasMany(Activity, { foreignKey: 'id_module'});
+Module.hasMany(LogEntry, { foreignKey: 'id_module'});
 
 
 Session.belongsTo(User, { foreignKey: 'id_user' });
@@ -121,6 +130,7 @@ LoginAttempt.belongsTo(User, { foreignKey: 'id_user' });
 // =======================================================================================
 
 Course.hasMany(Module, { foreignKey: 'id_course', as: 'modulos' });
+Course.hasMany(Activity, { foreignKey: 'course_id'});
 Module.belongsTo(Course, { foreignKey: 'id_course' });
 
 
@@ -157,6 +167,8 @@ LearningMaterial.belongsTo(Module, {
 });
 
 Student.hasMany(StudentPracticeAssignment, { foreignKey: 'id_student', onDelete: 'CASCADE' });
+Student.hasMany(LogEntry, { foreignKey: 'id_student'})
+
 Company.hasMany(StudentPracticeAssignment, { foreignKey: 'id_company', onDelete: 'CASCADE' });
 
 
@@ -172,8 +184,18 @@ Course.belongsToMany(Student, {
   otherKey: 'id_student'
 });
 
+StudentCourse.belongsTo(Student, { foreignKey: 'id_student', as: 'student' });
+Student.belongsTo(User, { foreignKey: 'id_user', as: 'user_student' });
+
+
+TeacherCourse.belongsTo(Teacher, { foreignKey: 'id_teacher' });
+TeacherCourse.belongsTo(Course, { foreignKey: 'id_course', as: 'course' });
+Teacher.hasMany(TeacherCourse, { foreignKey: 'id_teacher' });
+
 Teacher.belongsToMany(Course, { through: TeacherCourse, foreignKey: 'id_teacher', otherKey: 'id_course' });
 Course.belongsToMany(Teacher, { through: TeacherCourse, foreignKey: 'id_course', otherKey: 'id_teacher', as: 'teachers' });
+Course.hasMany(TeacherCourse, { foreignKey: 'id_course' });
+
 
 Group.belongsTo(Course, { foreignKey: 'id_course' });
 Group.belongsTo(Organization, { foreignKey: 'id_organization' });
@@ -183,7 +205,57 @@ Group.hasMany(PracticeAssignment, {foreignKey: 'id_group',as: 'practice_assignme
 Group.belongsToMany(Student, { through: GroupStudent, foreignKey: 'id_group', otherKey: 'id_student' });
 Student.belongsToMany(Group, { through: GroupStudent, foreignKey: 'id_student', otherKey: 'id_group' });
 
+
+
+// ====================================================================================================
+
+/// rutas de actividades y tareas
+Activity.belongsTo(Course, { foreignKey: 'course_id'})
+Activity.belongsTo(Teacher, { foreignKey: 'id_teacher'})
+Activity.belongsTo(Module, { foreignKey: 'id_module', as: 'module'});
+
+Activity.hasMany(ActivityResponse, {
+  foreignKey: 'id_activity',
+  as: 'responses'
+});
+
+ActivityResponse.belongsTo(Activity, {
+      foreignKey: 'id_activity',
+      as: 'activity',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
+
+    ActivityResponse.belongsTo(Student, {
+      foreignKey: 'id_student',
+      as: 'student',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
+
+ActivityResponse.hasMany(ActivityResponseAttachment, {
+  foreignKey: 'id_response',
+  as: 'attachments',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+// ActivityResponseAttachment.belongsTo(ActivityResponse, {
+//   foreignKey: 'id_'
+// })
+
 // Task Relationships
+
+// =============================================================================================
+
+// Rutas de bitacora
+
+LogEntry.belongsTo(Student, {foreignKey: 'id_student'})
+LogEntry.belongsTo(Module, {foreignKey: 'id_module' })
+LogEntry.hasMany(LogEntryFile, { foreignKey: 'id_log_entry' });
+LogEntryFile.belongsTo(LogEntry, { foreignKey: 'id_log_entry' });
+
+
 
 Task.belongsTo(Module, { foreignKey: 'id_module' });
 Task.belongsTo(TaskType, { foreignKey: 'id_task_type' });
@@ -216,6 +288,10 @@ TaskSubmission.belongsTo(Student, { foreignKey: 'id_student' });
 
 // TaskType Relationships
 TaskType.hasMany(Task, { foreignKey: 'id_task_type' });
+
+
+GroupStudent.belongsTo(Student, { foreignKey: 'id_student' });
+GroupStudent.belongsTo(Group, { foreignKey: 'id_group' });
 
 export {
   sequelize,

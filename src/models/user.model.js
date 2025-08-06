@@ -233,6 +233,56 @@ User.updateLastLogin = async function(id) {
   return affectedRows > 0;
 };
 
+// User.authenticateAndCreateSession = async function(email, password, sessionInfo) {
+//   const user = await User.findOne({ where: { email, is_active: true } });
+  
+//   await SessionService.recordLoginAttempt({
+//     email,
+//     ip_address: sessionInfo.ip_address,
+//     user_agent: sessionInfo.user_agent,
+//     status: user ? 'success' : 'failed',
+//     failure_reason: user ? null : 'Usuario no encontrado',
+//     id_user: user?.id_user
+//   });
+
+//   if (!user) throw new Error('Usuario no encontrado');
+
+//   const isPasswordValid = await bcrypt.compare(password, user.password);
+//   if (!isPasswordValid) {
+//     await SessionService.recordLoginAttempt({
+//       email,
+//       ip_address: sessionInfo.ip_address,
+//       user_agent: sessionInfo.user_agent,
+//       status: 'failed',
+//       failure_reason: 'Contraseña incorrecta',
+//       id_user: user.id_user
+//     });
+//     throw new Error('Contraseña incorrecta');
+//   }
+
+//   if (await SessionService.hasTooManyActiveSessions(user.id_user)) {
+//     throw new Error('Demasiadas sesiones activas');
+//   }
+
+//   const sessionId = await SessionService.createSession({
+//     id_user: user.id_user,
+//     ip_address: sessionInfo.ip_address,
+//     user_agent: sessionInfo.user_agent
+//   });
+
+//   const role = await Role.findByPk(user.id_role);
+
+//   return {
+//     user: {
+//       id_user: user.id_user,
+//       email: user.email,
+//       role
+//     },
+//     sessionId
+//   };
+// };
+
+
 User.authenticateAndCreateSession = async function(email, password, sessionInfo) {
   const user = await User.findOne({ where: { email, is_active: true } });
   
@@ -272,11 +322,34 @@ User.authenticateAndCreateSession = async function(email, password, sessionInfo)
 
   const role = await Role.findByPk(user.id_role);
 
+  // 🔽 Obtener id_teacher, id_admin o id_student según el rol
+  let roleSpecificId = null;
+
+  switch (role.name.toLowerCase()) {
+    case 'administrador':
+      const admin = await Admin.findOne({ where: { id_user: user.id_user } });
+      if (admin) roleSpecificId = { id_admin: admin.id_admin };
+      break;
+
+    case 'profesor':
+    case 'profesor':
+      const teacher = await Teacher.findOne({ where: { id_user: user.id_user } });
+      if (teacher) roleSpecificId = { id_teacher: teacher.id_teacher };
+      break;
+
+    case 'estudiante':
+    case 'estudiante':
+      const student = await Student.findOne({ where: { id_user: user.id_user } });
+      if (student) roleSpecificId = { id_student: student.id_student };
+      break;
+  }
+
   return {
     user: {
       id_user: user.id_user,
       email: user.email,
-      role
+      role,
+      ...roleSpecificId // incluirá id_teacher, id_admin o id_student
     },
     sessionId
   };

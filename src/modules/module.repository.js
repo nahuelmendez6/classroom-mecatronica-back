@@ -57,6 +57,22 @@ class ModuleRepository {
       ]
     });
   }
+
+
+  // Dentro de ModuleRepository
+  async findByCourseId(id_course) {
+    return await Module.findAll({
+      where: { id_course },
+      include: [
+        {
+          model: SubModule,
+          as: 'submodules'
+        }
+      ]
+    });
+  }
+
+
   // Crear un módulo
   async create(moduleData) {
     return await Module.create(moduleData);

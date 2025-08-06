@@ -4,8 +4,10 @@ import { createTeacherWithUser,
     // getTeacherById, 
     // restoreTeacher, 
     // softDeleteTeacher, 
-    // updateTeacher
+    
  } from "./teacher.service.js";
+
+import { updateTeacher } from './teacher.repository.js';
 import { sendSuccess, sendError, sendValidationError } from "../utils/responseHandler.js";
 import { asyncHandler } from "../utils/errorHandler.js";
 
@@ -60,13 +62,13 @@ class TeacherAdminController {
     //     sendSuccess(res, 200, 'Teacher soft deleted successfully');
     // });
 
-    // static update = asyncHandler(async (req, res) => {
-    //     const { id } = req.params;
-    //     const teacherData = req.body;
+    static update = asyncHandler(async (req, res) => {
+        const { id } = req.params;
+        const teacherData = req.body;
 
-    //     const updatedTeacher = await updateTeacher(id, teacherData);
-    //     sendSuccess(res, 200, 'Teacher updated successfully', updatedTeacher);
-    // });
+        const updatedTeacher = await updateTeacher(id, teacherData);
+        sendSuccess(res, 200, 'Teacher updated successfully', updatedTeacher);
+    });
 
 }
 
