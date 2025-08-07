@@ -139,3 +139,5 @@ dist
 # borrador tablas bd
 tables.txt
 requirements.txt
+
+uploads/

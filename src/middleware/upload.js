@@ -6,7 +6,7 @@ const storage = multer.diskStorage({
     // Detectar el endpoint o tipo de recurso desde req.route o req.baseUrl
     let folder = 'uploads/default';
 
-    if (req.baseUrl.includes('log-entries')) {
+    if (req.baseUrl.includes('log-entry')) {
       folder = 'uploads/log_entries';
     } else if (req.baseUrl.includes('activity-responses')) {
       folder = 'uploads/activity_responses';

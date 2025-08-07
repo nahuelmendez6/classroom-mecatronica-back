@@ -39,6 +39,14 @@ const LogEntry = sequelize.define('LogEntry', {
     deleted_at: {
       type: DataTypes.DATE,
       allowNull: true,
+    },
+    is_reviewed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    review_comment: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     }, 
 }, {
         tableName: 'log_entry',
