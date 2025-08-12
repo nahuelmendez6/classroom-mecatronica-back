@@ -32,6 +32,7 @@ import ActivityResponse from '../activity-response/activity.response.model.js';
 import ActivityResponseAttachment from '../activity-response/activity.response.attachment.js';
 import LogEntry from '../log-entry/log.entry.model.js';
 import LogEntryFile from '../log-entry/log.entry.file.js';
+import Comment from '../log-entry/comment.model.js';
 
 import TaskType from './task.type.model.js';
 import Task from './task.model.js';
@@ -255,6 +256,8 @@ LogEntry.belongsTo(Module, {foreignKey: 'id_module' })
 LogEntry.hasMany(LogEntryFile, { foreignKey: 'id_log_entry' });
 LogEntryFile.belongsTo(LogEntry, { foreignKey: 'id_log_entry' });
 
+LogEntry.hasMany(Comment, { foreignKey: 'id_log_entry' });
+Comment.belongsTo(LogEntry, { foreignKey: 'id_log_entry' });
 
 
 Task.belongsTo(Module, { foreignKey: 'id_module' });

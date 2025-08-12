@@ -54,6 +54,7 @@ import activityReponseRoutes from './activity-response/activity.response.routes.
 
 import logentryRoutes from './log-entry/log.entry.routes.js';
 import logentryfileRoutes from './log-entry/log.entry.file.routes.js';
+import commentRoutes from './log-entry/comment.routes.js';
 
 
 import './models/index.js';
@@ -178,7 +179,7 @@ app.use('/api/activity-responses', activityReponseRoutes);
 app.use('/api/log-entry', logentryRoutes);
 app.use('/api/log-entry/files', logentryfileRoutes);
 
-
+app.use('/api/comments', commentRoutes); // Rutas de comentarios
 
 
 
