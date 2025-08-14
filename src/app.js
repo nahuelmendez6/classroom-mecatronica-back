@@ -33,6 +33,7 @@ import teacherSelfRoutes from './teacher/teacher.self.routes.js';
 import organizationRoutes from './organization/organization.routes.js';
 import organizationAddressRoutes from './organization/organization.address.routes.js';
 import organizationContactRoutes from './organization/organization.contact.routes.js';
+import organizationAgreementRoutes from './organization/organization.agreement.routes.js';
 
 import subModuleRoutes from './modules/sub.module.routes.js';
 
@@ -151,7 +152,7 @@ app.use('/api/organizations', organizationRoutes); // Organizaciones
 app.use('/api/organization-addresses', organizationAddressRoutes); // Direcciones de organizaciones
 app.use('/api/organization-contacts', organizationContactRoutes); // Contactos de organizaciones
 
-
+app.use('/api/organization-agreements', organizationAgreementRoutes); // Acuerdos de organizaciones
 
 // =======================================================================================
 // ------------- Rutas de practicas --------------

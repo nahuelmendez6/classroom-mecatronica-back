@@ -37,7 +37,11 @@ const OrganizationContact = sequelize.define('OrganizationContact', {
   id_company: {
     type: DataTypes.INTEGER,
     allowNull: false
-  }
+  },
+    is_deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
 }, {
   tableName: 'organization_contact',
   timestamps: false

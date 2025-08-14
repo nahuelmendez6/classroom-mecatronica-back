@@ -52,7 +52,7 @@ import PracticeAssignment from '../practice/practice.assignment.model.js';
 import Organization from '../organization/organization.model.js';
 import OrganizationAddress from '../organization/organization.address.model.js';
 import OrganizationContact from '../organization/organization.contact.model.js';
-
+import OrganizationAgreement from '../organization/organization.agreement.model.js';
 
 // RELACIONES (sólo después de importar todo)
 
@@ -80,6 +80,10 @@ Organization.hasMany(OrganizationAddress, { foreignKey: 'id_organization' });
 Organization.hasMany(Agreement, { foreignKey: 'id_organization' });
 Organization.hasMany(PracticeAssignment, { foreignKey: 'id_organization' });
 Organization.hasMany(Group, {foreignKey: 'id_organization'});
+Organization.hasOne(OrganizationAgreement, { foreignKey: 'id_company' });
+
+OrganizationAgreement.belongsTo(Organization, { foreignKey: 'id_company' });
+
 
 OrganizationContact.belongsTo(User, { foreignKey: 'id_user' });
 OrganizationContact.belongsTo(Organization, { foreignKey: 'id_company' });
