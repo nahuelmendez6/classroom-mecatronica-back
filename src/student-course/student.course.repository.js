@@ -44,7 +44,7 @@ class StudentCourseRepository {
         {
           model: Student,
           as: 'student',
-          attributes: ['id_student', 'name', 'lastname', 'dni', 'phone_number', 'observations'],
+          attributes: ['id_student', 'name', 'lastname', 'dni', 'phone_number', 'observations', 'is_deleted'],
           include: [
             {
               model: User,

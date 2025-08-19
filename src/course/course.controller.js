@@ -55,6 +55,9 @@ class CourseController {
 
   async update(req, res) {
     try {
+      if (req.file) {
+        req.body.document_url = req.file.path; 
+      }
       const updated = await CourseService.updateCourse(req.params.id, req.body);
       return res.status(200).json({
         success: true,

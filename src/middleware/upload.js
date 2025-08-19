@@ -12,8 +12,9 @@ const storage = multer.diskStorage({
       folder = 'uploads/activity_responses';
     } else if (req.baseUrl.includes('organization-agreement')) {
       folder = 'uploads/agreements';
+    } else if (req.baseUrl.includes('course')) {
+      folder = 'uploads/course_syllabus';
     }
-
     cb(null, folder);
   },
   filename: (req, file, cb) => {

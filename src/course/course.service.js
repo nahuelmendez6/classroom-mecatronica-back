@@ -46,7 +46,7 @@ export async function getCourseById(id) {
 }
 
 export async function updateCourse(id, courseData) {
-    const { course, start_date, end_date, status, description } = courseData;
+    const { course, start_date, end_date, status, description, document_url } = courseData;
 
     const t = await sequelize.transaction();
 
@@ -64,13 +64,15 @@ export async function updateCourse(id, courseData) {
             start_date,
             end_date,
             status,
-            description
+            description,
+            document_url
         }, t);
 
         await t.commit();
         return updatedCourse;
     } catch (error) {
         await t.rollback();
+        console.error("Error real al actualizar curso:", error);
         throw new AppError('Error al actualizar el curso', 500);
     }
 }

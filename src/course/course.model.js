@@ -11,7 +11,10 @@ const Course = sequelize.define('Course', {
     start_date: DataTypes.DATEONLY,
     end_date: DataTypes.DATEONLY,
     status: DataTypes.STRING,
-    description: DataTypes.TEXT
+    description: DataTypes.TEXT,
+    document_url: {
+      type: DataTypes.TEXT,
+    }
 }, {
   tableName: 'course',
   timestamps: false
