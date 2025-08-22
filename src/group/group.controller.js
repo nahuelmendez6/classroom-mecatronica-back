@@ -76,6 +76,17 @@ const groupController = {
     }
   },
 
+   async getByCourse(req, res) {
+    try {
+      const { id_course } = req.params;
+      const records = await groupRepository.findGroupByCourse(id_course);
+      res.json(records);
+    } catch (error) {
+      console.error('Error fetching groups by course:', error);
+      res.status(500).json({ error: 'Error fetching groups by course' });
+    }
+  },
+
   async getGroupsByOrganization(req, res) {
     try {
       const { id_organization } = req.params;

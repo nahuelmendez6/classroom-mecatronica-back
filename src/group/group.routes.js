@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.get('/', groupController.getAllGroups);
 router.get('/:id', groupController.getGroupById);
+router.get('/by-course/:id_course', groupController.getByCourse);
 router.post('/', groupController.createGroup);
 router.patch('/:id', groupController.updateGroup);
 router.delete('/:id', groupController.deleteGroup);

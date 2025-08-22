@@ -30,6 +30,7 @@ const groupStudentRepository = {
   }
 }
 ,
+  
 
   async findByGroupId(id_group) {
     return await GroupStudent.findAll({ where: { id_group } });

@@ -6,6 +6,8 @@ const router = express.Router();
 // Obtener todas las relaciones group-student
 router.get('/', groupStudentController.getAll);
 
+
+
 // Obtener todos los estudiantes de un grupo
 router.get('/group/:id_group', groupStudentController.getByGroupId);
 
