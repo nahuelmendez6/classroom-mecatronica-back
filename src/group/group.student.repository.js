@@ -2,6 +2,7 @@ import GroupStudent from './group.student.model.js';
 import Student from '../student/student.model.js';
 import Group from '../group/group.model.js';
 import Organization from '../organization/organization.model.js';
+import OrganizationContact from '../organization/organization.contact.model.js';
 
 const groupStudentRepository = {
   async findAll() {
@@ -37,7 +38,28 @@ const groupStudentRepository = {
   },
 
   async findByStudentId(id_student) {
-    return await GroupStudent.findAll({ where: { id_student } });
+    return await GroupStudent.findAll({ 
+      where: { id_student },
+      
+      include: [
+        
+        {model: Group,
+          attributes: ['id_group', 'group_name'],
+          include: [
+            {
+              model: Organization,
+              attributes: ['id_organization', 'name'],
+              include: [
+                {
+                  model: OrganizationContact,
+                  attributes: ['id_contact', 'name', 'last_name', 'email']
+                }
+              ]
+            }
+          ]
+        },
+      ]
+    });
   },
 
   async findByCompositeKey(id_group, id_student) {

@@ -212,6 +212,7 @@ Student.belongsToMany(Group, { through: GroupStudent, foreignKey: 'id_student', 
 
 
 
+
 // ====================================================================================================
 
 /// rutas de actividades y tareas
