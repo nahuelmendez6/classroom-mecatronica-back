@@ -41,6 +41,8 @@ import subModuleRoutes from './modules/sub.module.routes.js';
 import studentCourseRoute from './student-course/student.course.routes.js';
 import studentRoutes from './student/student.routes.js';
 
+import attendanceRoutes from './attendance/attendance.routes.js';
+
 import groupRoutes from './group/group.routes.js'; // Added
 import studentGroupRoutes from './group/group.student.routes.js'
 
@@ -109,6 +111,7 @@ app.use('/api/users', userRoutes);   // Usuarios
 
 // 2. Rutas de entidades principales
 app.use('/api/students', studentRoutes); // Estudiantes
+
 // app.use('/api/teacher', teacherRoutes); // Profesores
 app.use('/api/teachers', teacherAdminRoutes); // Profesores (admin)
 app.use('/api/teacher/self', teacherSelfRoutes); // Profesores (self)
@@ -134,6 +137,9 @@ app.use('/api/teacher-courses', teacherCourseRoutes); // Cursos de profesores
 // app.use('/api/practice-assignments', studentPracticeRoutes); // Asignación de prácticas
 // app.use('/api/groups', groupRoutes); // Grupos
 
+
+
+app.use('/api/attendance', attendanceRoutes); // Asistencias
 
 // ======================================================================================
 // Rutas de grupos

@@ -48,6 +48,9 @@ import QueryResponse from './query.response.model.js';
 import PracticeAssignment from '../practice/practice.assignment.model.js';
 
 
+import Attendance from '../attendance/attendance.model.js';
+
+
 // ----- modelos de organización -----
 import Organization from '../organization/organization.model.js';
 import OrganizationAddress from '../organization/organization.address.model.js';
@@ -67,6 +70,7 @@ User.hasMany(LoginAttempt, { foreignKey: 'id_user' });
 Student.belongsTo(User, { foreignKey: 'id_user', as: 'user' });
 // Student.hasMany(StudentModule, { foreignKey: 'id_student' });
 Student.hasMany(PracticeAssignment, { foreignKey: 'id_student' });
+
 
 Teacher.belongsTo(User, { foreignKey: 'id_user' });
 Teacher.hasMany(Activity, { foreignKey: 'id_teacher'});
@@ -106,6 +110,30 @@ PracticeAssignment.belongsTo(Organization, {
 });
 
 
+
+// ========================================================================================
+// Relaciones de asistencias
+Attendance.belongsTo(Student, {
+  foreignKey: "id_student",
+  as: "student",
+  onDelete: "CASCADE",
+});
+
+Attendance.belongsTo(Organization, {
+  foreignKey: "id_organization",
+  as: "organization",
+  onDelete: "CASCADE",
+});
+
+Student.hasMany(Attendance, {
+  foreignKey: "id_student",
+  as: "attendances",
+});
+
+Organization.hasMany(Attendance, {
+  foreignKey: "id_organization",
+  as: "attendances",
+});
 
 Module.hasMany(StudentModule, { foreignKey: 'id_module' });
 Module.hasMany(StudentPracticeAssignment, { foreignKey: 'id_module' });
@@ -333,5 +361,6 @@ export {
   QuestionType,
   QuestionOption,
   Query,
-  QueryResponse
+  QueryResponse,
+  Attendance,
 };
