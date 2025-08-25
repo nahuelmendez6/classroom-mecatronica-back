@@ -79,7 +79,7 @@ Admin.belongsTo(User, { foreignKey: 'id_user' });
 
 // ========================================================================================
 
-Organization.hasMany(OrganizationContact, { foreignKey: 'id_company' });
+Organization.hasMany(OrganizationContact, { foreignKey: 'id_company', as: 'contacts' });
 Organization.hasMany(OrganizationAddress, { foreignKey: 'id_organization' });
 Organization.hasMany(Agreement, { foreignKey: 'id_organization' });
 Organization.hasMany(PracticeAssignment, { foreignKey: 'id_organization' });
@@ -90,7 +90,7 @@ OrganizationAgreement.belongsTo(Organization, { foreignKey: 'id_company' });
 
 
 OrganizationContact.belongsTo(User, { foreignKey: 'id_user' });
-OrganizationContact.belongsTo(Organization, { foreignKey: 'id_company' });
+OrganizationContact.belongsTo(Organization, { foreignKey: 'id_company', as: 'organization' });
 
 OrganizationAddress.belongsTo(Organization, { foreignKey: 'id_organization' });
 
@@ -119,21 +119,14 @@ Attendance.belongsTo(Student, {
   onDelete: "CASCADE",
 });
 
-Attendance.belongsTo(Organization, {
-  foreignKey: "id_organization",
-  as: "organization",
-  onDelete: "CASCADE",
-});
+Attendance.belongsTo(Organization, { foreignKey: 'id_organization', as: 'organization' });
 
 Student.hasMany(Attendance, {
   foreignKey: "id_student",
   as: "attendances",
 });
 
-Organization.hasMany(Attendance, {
-  foreignKey: "id_organization",
-  as: "attendances",
-});
+Organization.hasMany(Attendance, { foreignKey: 'id_organization', as: 'attendances' });
 
 Module.hasMany(StudentModule, { foreignKey: 'id_module' });
 Module.hasMany(StudentPracticeAssignment, { foreignKey: 'id_module' });

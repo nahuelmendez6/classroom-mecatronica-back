@@ -9,12 +9,15 @@ import { check } from 'express-validator';
 const router = express.Router();
 
 // Middleware para verificar el token y el rol de usuario
-router.use(verifyToken, checkRole(['administrador']));
+router.use(verifyToken, checkRole(['administrador','tutor']));
 
 // Rutas para manejar contactos de organización
 router.get('/', OrganizationContactController.getAll);
 router.get('/:id', OrganizationContactController.getById);
 router.get('/by-company/:id_company', OrganizationContactController.getByCompanyId);
+// buscar asistencias
+router.get('/:id/attendances', OrganizationContactController.getAttendancesByContactId);
+
 
 router.post('/', OrganizationContactController.createWithUser);
 

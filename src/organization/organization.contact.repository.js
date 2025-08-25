@@ -1,5 +1,9 @@
-import OrganizationContact from './organizationContact.model.js';
+import OrganizationContact from './organization.contact.model.js';
 import User from '../models/user.model.js';
+import Student from '../student/student.model.js';
+import Attendance from '../attendance/attendance.model.js';
+import { where } from 'sequelize';
+import Organization from './organization.model.js';
 
 export async function findAll() {
   return await OrganizationContact.findAll({
@@ -29,6 +33,34 @@ export async function deleteById(id) {
     where: { id_contact: id },
   });
 }
+
+export async function findAttendancesByContactId(id_contact) {
+  const contact = await OrganizationContact.findOne({
+    where: { id_contact },
+    include: [
+      {
+        model: Organization, // 👈 primero traemos la organización
+        as: 'organization',
+        include: [
+          {
+            model: Attendance, // 👈 luego las asistencias
+            as: 'attendances',
+            include:[
+              {
+                model: Student,
+                as: 'student',
+                attributes: ['id_student', 'name', 'lastname'],
+              }
+            ]
+          },
+        ],
+      },
+    ],
+  });
+
+  return contact?.organization?.attendances || [];
+}
+
 
 export async function findByCompanyId(id_company) {
   return await OrganizationContact.findAll({

@@ -40,6 +40,17 @@ const AttendanceController = {
     }
   },
 
+  async getByOrganization(req, res) {
+    try {
+      const { organizationId } = req.params;
+      const attendances = await AttendanceRepository.findByOrganizationId(organizationId);
+      res.json(attendances);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error al obtener asistencias de la organización', error });
+    }
+  },
+
   async getAll(req, res) {
     try {
       const attendances = await AttendanceRepository.findAll();

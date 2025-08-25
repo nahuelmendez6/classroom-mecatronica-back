@@ -17,6 +17,13 @@ const AttendanceRepository = {
     });
   },
 
+  async findByOrganizationId(organizationId) {
+    return await Attendance.findAll({
+      where: { id_organization: organizationId },
+      order: [['attendance_date', 'DESC']],
+    });
+  },
+
   async findAll(filter = {}) {
     return await Attendance.findAll({
       where: filter,

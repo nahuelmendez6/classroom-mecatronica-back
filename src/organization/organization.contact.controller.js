@@ -7,6 +7,8 @@ import {
     getContactsByCompanyId
 } from  './organization.contact.service.js';
 
+import { findAttendancesByContactId } from './organization.contact.repository.js';
+
 import { asyncHandler } from '../utils/errorHandler.js';
 
 import { sendSuccess } from '../utils/responseHandler.js';
@@ -30,6 +32,12 @@ class OrganizationContactController {
             return sendError(res, 404, 'Organization contact not found');
         }
         sendSuccess(res, 200, 'Organization contact retrieved successfully', contact);
+    });
+
+    static getAttendancesByContactId = asyncHandler(async (req, res) => {
+        const contactId = req.params.id;
+        const attendances = await findAttendancesByContactId(contactId);
+        sendSuccess(res, 200, 'Attendances retrieved successfully', attendances);
     });
 
     static update = asyncHandler(async (req, res) => {

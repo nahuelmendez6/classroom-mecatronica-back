@@ -13,6 +13,9 @@ router.get('/', AttendanceController.getAll);
 // Obtener asistencia por ID
 router.get('/:id', AttendanceController.getById);
 
+// Obtener asistencias por organización
+router.get('/organization/:organizationId', AttendanceController.getByOrganization);
+
 // Obtener asistencias de un estudiante
 router.get('/student/:studentId', AttendanceController.getByStudent);
 
