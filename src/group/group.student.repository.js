@@ -52,7 +52,8 @@ const groupStudentRepository = {
               include: [
                 {
                   model: OrganizationContact,
-                  attributes: ['id_contact', 'name', 'last_name', 'email']
+                  attributes: ['id_contact', 'name', 'last_name', 'email'],
+                  as: 'contacts'
                 }
               ]
             }

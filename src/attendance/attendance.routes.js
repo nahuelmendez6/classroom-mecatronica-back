@@ -22,7 +22,12 @@ router.get('/student/:studentId', AttendanceController.getByStudent);
 // Actualizar asistencia
 router.patch('/:id', AttendanceController.update);
 
-// Eliminar asistencia
+// Eliminar asistencia- ,.,.,;,.++¨¨¨+*******
 router.delete('/:id', AttendanceController.delete);
 
 export default router;
+
+
+
+
+

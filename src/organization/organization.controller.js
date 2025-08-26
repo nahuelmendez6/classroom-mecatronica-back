@@ -25,8 +25,10 @@ class OrganizationController {
     static getAll = asyncHandler(async (req, res) => {
         try {
             const organizations = await findAll();
+            console.log('Organizations fetched:', organizations);
             res.status(200).json({
                 message: 'Organizations retrieved successfully',
+                
                 data: organizations
             });
         } catch (err) {

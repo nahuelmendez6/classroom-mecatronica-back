@@ -8,6 +8,7 @@ export async function findAll() {
             {
                 model: OrganizationContact,
                 attributes: ['id_contact', 'name', 'last_name', 'email', 'phone'], // ajustá según tus columnas reales
+                as: 'contacts', // asegúrate de que este alias coincida con el definido en la asociación
                 required: false 
             }
         ]
