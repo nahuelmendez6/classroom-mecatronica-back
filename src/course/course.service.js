@@ -9,19 +9,18 @@ import * as CourseRepo from './course.repository.js';
 
 
 export async function createCourse(courseData) {
-    const { course, start_date, end_date, status, description } = courseData;
+    const { course, year, status, description } = courseData;
 
-    const startDate = new Date(start_date);
-    const endDate = new Date(end_date);
-    if (startDate >= endDate) {
-        throw new AppError('La fecha de inicio debe ser anterior a la fecha de finalización', 400);
-    }
+    // const startDate = new Date(start_date);
+    // const endDate = new Date(end_date);
+    // if (startDate >= endDate) {
+    //     throw new AppError('La fecha de inicio debe ser anterior a la fecha de finalización', 400);
+    // }
 
     try {
         const newCourse = await CourseRepo.createCourse({
             course,
-            start_date,
-            end_date,
+            year,
             status,
             description
         });
@@ -46,24 +45,22 @@ export async function getCourseById(id) {
 }
 
 export async function updateCourse(id, courseData) {
-    const { course, start_date, end_date, status, description, document_url } = courseData;
+    const { course, year, status, description, document_url } = courseData;
 
     const t = await sequelize.transaction();
 
     try {
-        if (start_date && end_date) {
-            const startDate = new Date(start_date);
-            const endDate = new Date(end_date);
-            if (startDate >= endDate) {
-                throw new AppError('La fecha de inicio debe ser anterior a la fecha de finalización', 400);
-            }
-        }
+        // if (start_date && end_date) {
+        //     const startDate = new Date(start_date);
+        //     const endDate = new Date(end_date);
+        //     if (startDate >= endDate) {
+        //         throw new AppError('La fecha de inicio debe ser anterior a la fecha de finalización', 400);
+        //     }
+        // }
 
         const updatedCourse = await CourseRepo.updateCourse(id, {
             course,
-            start_date,
-            end_date,
-            status,
+            year,
             description,
             document_url
         }, t);

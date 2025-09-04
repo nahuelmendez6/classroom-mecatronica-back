@@ -11,6 +11,7 @@ import { Op } from 'sequelize';
  * Crea un nuevo curso.
  */
 export async function createCourse(courseData) {
+  console.log("BODY de curso recibido: ", courseData)
   return await Course.create(courseData);
 }
 

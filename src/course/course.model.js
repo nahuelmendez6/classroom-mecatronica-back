@@ -7,17 +7,23 @@ const Course = sequelize.define('Course', {
       primaryKey: true,
       autoIncrement: true
     },
-    course: DataTypes.STRING,   
-    start_date: DataTypes.DATEONLY,
-    end_date: DataTypes.DATEONLY,
-    status: DataTypes.STRING,
+    course: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    year: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     description: DataTypes.TEXT,
-    document_url: {
-      type: DataTypes.TEXT,
-    }
+    document_url: DataTypes.TEXT
 }, {
   tableName: 'course',
   timestamps: false
-})
+});
 
 export default Course;

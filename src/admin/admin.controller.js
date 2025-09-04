@@ -6,6 +6,8 @@ import { createAdminWithUser } from './admin.service.js';
 import { validationResult } from 'express-validator';
 import {asyncHandler} from '../utils/errorHandler.js';
 
+import { sendValidationError } from '../utils/responseHandler.js';
+
 class AdminController {
   // Obtener todos los administradores activos
   static async getAll(req, res) {

@@ -3,6 +3,7 @@ import * as CourseService from './course.service.js';
 class CourseController {
   async create(req, res) {
     try {
+      
       const course = await CourseService.createCourse(req.body);
       return res.status(201).json({
         success: true,
