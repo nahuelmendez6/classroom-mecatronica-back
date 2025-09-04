@@ -1,4 +1,7 @@
+import { where } from 'sequelize';
 import * as CourseService from './course.service.js';
+
+import Course from './course.model.js';
 
 class CourseController {
   async create(req, res) {
@@ -19,6 +22,30 @@ class CourseController {
       });
     }
   }
+
+  async getCourses(req, res) {
+    try {
+      const { year } = req.query; // año opcional
+      let whereClause = {};
+
+      if (year) {
+        whereClause.year = parseInt(year);
+      } else {
+        whereClause.year = new Date().getFullYear();
+      }
+
+      const courses = await Course.findAll({
+        where: whereClause,
+        order: [['year', 'DESC'], ['course', 'ASC']]
+      });
+
+
+      res.json({ success: true, data: courses});
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({success: false, message: 'Error al obtener cursos'});
+    }
+  };
 
   async findAll(req, res) {
     try {

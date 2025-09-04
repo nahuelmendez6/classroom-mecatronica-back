@@ -9,7 +9,7 @@ const router = express.Router();
 router.use(verifyToken, checkRole(['administrador']));
 
 router.post('/', CourseController.create);
-router.get('/', CourseController.findAll);
+router.get('/', CourseController.getCourses);
 router.get('/active', CourseController.findActive);
 router.get('/:id', CourseController.findById);
 router.put('/:id', upload.single('file'), CourseController.update);
