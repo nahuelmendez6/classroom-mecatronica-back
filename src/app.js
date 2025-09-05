@@ -40,6 +40,7 @@ import subModuleRoutes from './modules/sub.module.routes.js';
 // import taskRoutes from './routes/task.routes.js';
 import studentCourseRoute from './student-course/student.course.routes.js';
 import studentRoutes from './student/student.routes.js';
+import studentAgreementRoutes from './student/student.agreement.routes.js';
 
 import attendanceRoutes from './attendance/attendance.routes.js';
 
@@ -111,6 +112,8 @@ app.use('/api/users', userRoutes);   // Usuarios
 
 // 2. Rutas de entidades principales
 app.use('/api/students', studentRoutes); // Estudiantes
+
+app.use('/api/student-agreements', studentAgreementRoutes);
 
 // app.use('/api/teacher', teacherRoutes); // Profesores
 app.use('/api/teachers', teacherAdminRoutes); // Profesores (admin)
