@@ -4,7 +4,7 @@ import { Router } from 'express';
 import TeacherAdminController from './teacher.admin.controller.js';
 
 import { verifyToken, checkRole } from '../middleware/auth.middleware.js';
-import { teacherValidation, userValidation } from '../utils/validation.js ';
+import { teacherValidation } from '../utils/validation.js';
 import { check } from 'express-validator';
 
 const router = Router();
@@ -24,15 +24,16 @@ router.use(verifyToken, checkRole(['administrador', 'profesor']));
 //     teacherValidation.observations
 // ], teacherAdminController.create);
 router.get('/', TeacherAdminController.getAll);
+// console.log('teacherValidation:', teacherValidation);
 
 router.post('/full', [
-    teacherValidation.name,
-    teacherValidation.lastname,
-    teacherValidation.phone_number,
-    teacherValidation.observations,
-    userValidation.email,
-    userValidation.password,
-    userValidation.dni
+    // teacherValidation.name,
+    // teacherValidation.lastname,
+    // teacherValidation.phone_number,
+    // teacherValidation.observations,
+    // userValidation.email,
+    // userValidation.password,
+    // userValidation.dni
 ], TeacherAdminController.createWithUser);
 
 router.patch('/:id', TeacherAdminController.update);
