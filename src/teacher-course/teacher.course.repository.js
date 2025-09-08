@@ -18,7 +18,7 @@ class TeacherCourseRepository {
       {
         model: Course,
         as: 'course', // debe coincidir con el alias usado en belongsTo
-        attributes: ['id_course', 'course', 'start_date', 'end_date', 'status', 'description']
+        attributes: ['id_course', 'course', 'year', 'status', 'description']
       }
     ]
   });

@@ -11,8 +11,8 @@ Course.init({
     autoIncrement: true
   },
   course: DataTypes.STRING,
-  start_date: DataTypes.DATEONLY,
-  end_date: DataTypes.DATEONLY,
+  // start_date: DataTypes.DATEONLY,
+  // end_date: DataTypes.DATEONLY,
   status: DataTypes.STRING,
   description: DataTypes.TEXT
 }, {

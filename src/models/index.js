@@ -1,4 +1,5 @@
 import sequelize from '../config/sequalize.js';
+console.log('>> Ejecutando models/index.js');
 
 // ========================
 // MODELOS DE USUARIO
@@ -140,6 +141,7 @@ Module.belongsTo(Course, { foreignKey: 'id_course' });
 
 Module.hasMany(SubModule, { foreignKey: 'id_module', as: 'submodules', onDelete: 'CASCADE' });
 SubModule.belongsTo(Module, { foreignKey: 'id_module', as: 'module', onDelete: 'CASCADE' });
+// SubModule.hasMany(Activity, { foreignKey: 'id_sub_module', as: 'sub_modules_activities' });
 
 Module.hasMany(StudentModule, { foreignKey: 'id_module' });
 StudentModule.belongsTo(Module, { foreignKey: 'id_module' });
@@ -180,6 +182,7 @@ GroupStudent.belongsTo(Group, { foreignKey: 'id_group' });
 Activity.belongsTo(Course, { foreignKey: 'course_id' });
 Activity.belongsTo(Teacher, { foreignKey: 'id_teacher' });
 Activity.belongsTo(Module, { foreignKey: 'id_module', as: 'module' });
+Activity.belongsTo(SubModule, { foreignKey: 'id_sub_module', as: 'subModule_activty' });
 Activity.hasMany(ActivityResponse, { foreignKey: 'id_activity', as: 'responses' });
 
 ActivityResponse.belongsTo(Activity, { foreignKey: 'id_activity', as: 'activity', onDelete: 'CASCADE', onUpdate: 'CASCADE' });

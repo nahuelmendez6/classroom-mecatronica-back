@@ -57,6 +57,16 @@ const Activity = sequelize.define('Activity', {
     onUpdate: 'CASCADE',
     onDelete: 'SET NULL',
   },
+  id_sub_module: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'sub_module',
+      key: 'id_sub_module',
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  }
 }, {
   tableName: 'activity',
   timestamps: false,
