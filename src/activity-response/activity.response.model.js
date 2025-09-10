@@ -24,6 +24,10 @@ const ActivityResponse = sequelize.define('ActivityResponse', {
       type: DataTypes.TEXT,
       allowNull: true
     },
+    teacher_comment: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
     grade: {
       type: DataTypes.DECIMAL(5, 2),
       allowNull: true
