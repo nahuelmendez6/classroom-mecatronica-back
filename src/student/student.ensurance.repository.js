@@ -1,4 +1,4 @@
-import StudentEnsurance from '../models/StudentEnsurance.js';
+import StudentEnsurance from './student.ensurance.js';
 import Student from "./student.model.js";
 
 const StudentEnsuranceRepository = {

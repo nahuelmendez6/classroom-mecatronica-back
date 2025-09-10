@@ -1,13 +1,29 @@
-import StudentEnsuranceRepository from '../repositories/studentEnsuranceRepository.js';
+import StudentEnsuranceRepository from './student.ensurance.repository.js';
 
 const StudentEnsuranceController = {
   // Crear un nuevo seguro de estudiante
   async create(req, res) {
     try {
       const data = req.body;
+    
+      if (req.file) data.document_url = req.file.path;
+
+      // asignar año 
+      if (!data.year) data.year = new Date().getFullYear();
+
+      // Verificar si ya existe un seguro para el estudiante en el mismo año
+      const existingRecord = await StudentEnsuranceRepository.findByStudentAndYear(data.id_student, data.year);
+      if (existingRecord) {
+        return res.status(400).json({ message: 'Ya existe un seguro para este estudiante en el año especificado' });
+      }
+
+      // Crear el nuevo registro    
+
+
       const newRecord = await StudentEnsuranceRepository.create(data);
       res.status(201).json(newRecord);
     } catch (error) {
+        console.error("Error al crear seguro de estudiante: ", error);
       res.status(500).json({ error: error.message });
     }
   },
@@ -49,27 +65,35 @@ const StudentEnsuranceController = {
   // Actualizar un seguro por ID
   async update(req, res) {
     try {
-      const { id } = req.params;
-      const data = req.body;
-      const updatedRecord = await StudentEnsuranceRepository.update(id, data);
-      if (!updatedRecord) return res.status(404).json({ message: 'Registro no encontrado' });
-      res.json(updatedRecord);
+        const { id } = req.params;
+        const data = req.body;
+
+        if (req.file) {
+        data.document_url = req.file.path;
+        }
+
+        const updatedRecord = await StudentEnsuranceRepository.update(id, data);
+        if (!updatedRecord) return res.status(404).json({ message: 'Registro no encontrado' });
+        res.json(updatedRecord);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+        console.error(error); // imprime el error completo en consola
+        res.status(500).json({ error: error.message });
     }
   },
 
+
   // Eliminar un seguro por ID
-  async delete(req, res) {
-    try {
-      const { id } = req.params;
-      const deletedRecord = await StudentEnsuranceRepository.delete(id);
-      if (!deletedRecord) return res.status(404).json({ message: 'Registro no encontrado' });
-      res.json({ message: 'Registro eliminado correctamente' });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    remove: async (req, res) => {
+        try {
+        const { id } = req.params;
+        const deletedRecord = await StudentEnsuranceRepository.delete(id);
+        if (!deletedRecord) return res.status(404).json({ message: 'Registro no encontrado' });
+        res.json({ message: 'Registro eliminado correctamente' });
+        } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+        }
     }
-  }
 };
 
 export default StudentEnsuranceController;

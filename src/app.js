@@ -41,6 +41,7 @@ import subModuleRoutes from './modules/sub.module.routes.js';
 import studentCourseRoute from './student-course/student.course.routes.js';
 import studentRoutes from './student/student.routes.js';
 import studentAgreementRoutes from './student/student.agreement.routes.js';
+import studentEnsuranceRoutes from './student/student.ensurane.routes.js';
 
 import attendanceRoutes from './attendance/attendance.routes.js';
 
@@ -114,6 +115,7 @@ app.use('/api/users', userRoutes);   // Usuarios
 app.use('/api/students', studentRoutes); // Estudiantes
 
 app.use('/api/student-agreements', studentAgreementRoutes);
+app.use('/api/student-ensurances', studentEnsuranceRoutes);
 
 // app.use('/api/teacher', teacherRoutes); // Profesores
 app.use('/api/teachers', teacherAdminRoutes); // Profesores (admin)

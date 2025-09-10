@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/sequalize.js';
+import Student from './student.model.js';
 
 const StudentEnsurance = sequelize.define('StudentEnsurance', {
   id_student_ensurance: {

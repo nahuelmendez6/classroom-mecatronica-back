@@ -1,5 +1,5 @@
 import express from 'express';
-import StudentEnsuranceController from './studentEnsurance.controller.js';
+import StudentEnsuranceController from './student.ensurance.controller.js';
 import { upload } from '../middleware/upload.js';
 
 const router = express.Router();
@@ -17,6 +17,6 @@ router.get('/:id', StudentEnsuranceController.getById);
 router.put('/:id', upload.single('file'), StudentEnsuranceController.update);
 
 // Eliminar un seguro
-router.delete('/:id', StudentEnsuranceController.delete);
+router.delete('/:id', StudentEnsuranceController.remove);
 
 export default router;

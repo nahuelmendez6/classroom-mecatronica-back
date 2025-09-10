@@ -19,6 +19,7 @@ import LoginAttempt from './login.attempt.model.js';
 // Acuerdo de estudiante
 // ========================
 import StudentAgreement from '../student/student.agreement.js';
+import StudentEnsurance from '../student/student.ensurance.js';
 
 
 // ========================
@@ -108,6 +109,7 @@ Student.hasMany(PracticeAssignment, { foreignKey: 'id_student' });
 Student.hasMany(StudentPracticeAssignment, { foreignKey: 'id_student', onDelete: 'CASCADE' });
 Student.hasMany(LogEntry, { foreignKey: 'id_student' });
 Student.hasMany(StudentAgreement, { foreignKey: 'id_student', as: 'agreements'});
+Student.hasMany(StudentEnsurance, { foreignKey: 'id_student', as: 'ensurances'});
 
 Teacher.belongsTo(User, { foreignKey: 'id_user' });
 Teacher.hasMany(Activity, { foreignKey: 'id_teacher' });
@@ -133,6 +135,7 @@ OrganizationAddress.belongsTo(Organization, { foreignKey: 'id_organization' });
 Agreement.belongsTo(Organization, { foreignKey: 'id_organization' });
 
 StudentAgreement.belongsTo(Student, { foreignKey: 'id_student', as: 'student'});
+StudentEnsurance.belongsTo(Student, { foreignKey: 'id_student', as: 'student'});
 
 // --- Cursos y Módulos ---
 Course.hasMany(Module, { foreignKey: 'id_course', as: 'modulos' });
